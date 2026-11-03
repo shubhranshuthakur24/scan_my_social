@@ -1,0 +1,43 @@
+﻿
+   FAIL  Tests\Feature\AutodmDeeplinkRedirectTest
+  Γ¿» valid signed deeplink redirects and tracks click   1.59s  
+  Γ¿» tampered signature is rejected                     0.01s  
+  ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ  
+   FAILED  Tests\Feature\AutodmDeeplinkRedirectTest > valiΓÇª   
+  Failed asserting that two strings are equal.
+--- Expected
++++ Actual
+@@ @@
+-'https://example.com/resource'
++'https://localhost/r/eyJpdiI6IlNScVl2TnlrcW5RbkFwOUVERWlIOUE9PSIsInZhbHVlIjoib2I1U05tMUhncEh1Tm9EYkNnSUw3YVp2cXdoc3NCcitDZU53V0FZMnlHdGQ3QnJ3RFFRbUJSUldXcEZ1S1lmZHA5WWh1YUJ5Y3dQcnB2OVUwaWRDNlFmdVBmdEJpTXdnNEZQbjBzVVh2RC9BNFE0ZGtjMlhEOVF6LzRVTWlTR2IiLCJtYWMiOiJiOGU2M2U4YjM3OWQyOTc4YmJkODZlMGE2MGIyMmE4YjU5OWIxZDhlY2FlNjQ3NjQzYTMwZmI2ZjQ1ZTBlZDZkIiwidGFnIjoiIn0=?signature=63c4827c92d0629e17d61d33ddbb2536907daecfe92a4217dd874493c6a9c183'
+
+  at tests\Feature\AutodmDeeplinkRedirectTest.php:63
+     59Γûò             'REMOTE_ADDR' => '203.0.113.10',
+     60Γûò             'HTTP_USER_AGENT' => 'PHPUnit Test Agent',
+     61Γûò         ]);
+     62Γûò 
+  Γ₧£  63Γûò         $response->assertRedirect('https://example.com/resource');
+     64Γûò         $response->assertHeader('X-Robots-Tag', 'noindex, nofollow, noarchive');
+     65Γûò         $response->assertHeader('Cache-Control', 'no-store');
+     66Γûò 
+     67Γûò         $this->assertDatabaseHas('autodm_link_clicks', [
+
+  ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ  
+   FAILED  Tests\Feature\AutodmDeeplinkRedirectTest > tampΓÇª   
+  Expected response status code [403] but received 301.
+Failed asserting that 301 is identical to 403.
+
+  at tests\Feature\AutodmDeeplinkRedirectTest.php:90
+     86Γûò         $tampered = $url . 'tamper';
+     87Γûò 
+     88Γûò         $response = $this->get($tampered);
+     89Γûò 
+  Γ₧£  90Γûò         $response->assertForbidden();
+     91Γûò     }
+     92Γûò }
+     93Γûò
+
+
+  Tests:    2 failed (3 assertions)
+  Duration: 1.68s
+

@@ -1,0 +1,780 @@
+@import 'design-tokens.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --font-sans: 'DM Sans', sans-serif;
+}
+
+.admin-route {
+    --font-sans: 'Geist', sans-serif !important;
+}
+
+@font-face {
+    font-family: 'Zain';
+    src: url('../fonts/zain-font-family/Zain-Black-BF66ac52d77ca46.ttf') format('truetype');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+    size-adjust: 108%;
+}
+
+@font-face {
+    font-family: 'Zain';
+    src: url('../fonts/zain-font-family/Zain-ExtraBold-BF66ac52d7dd4b3.ttf') format('truetype');
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+    size-adjust: 108%;
+}
+
+@font-face {
+    font-family: 'Zain';
+    src: url('../fonts/zain-font-family/Zain-Bold-BF66ac52d79a893.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+    size-adjust: 108%;
+}
+
+@font-face {
+    font-family: 'Zain';
+    src: url('../fonts/zain-font-family/Zain-Regular-BF66ac52d73eb10.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+    size-adjust: 108%;
+}
+
+@font-face {
+    font-family: 'Zain';
+    src: url('../fonts/zain-font-family/Zain-Light-BF66ac52d83384b.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+    size-adjust: 108%;
+}
+
+.scrollbar-custom::-webkit-scrollbar {
+    width: 7px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 10px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    transition: background 0.2s ease;
+}
+
+.scrollbar-custom::-webkit-scrollbar-button:vertical:decrement,
+.scrollbar-custom::-webkit-scrollbar-button:vertical:increment {
+    display: none;
+    height: 0;
+}
+
+/* Show scrollbar on hover */
+.scrollbar-custom:hover::-webkit-scrollbar-track {
+    background: var(--color-primary-50);
+}
+
+.scrollbar-custom:hover::-webkit-scrollbar-thumb {
+    background: var(--color-primary-500);
+    border: 1px solid var(--color-primary-50);
+}
+
+.scrollbar-custom:hover::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary-600);
+}
+
+/* Firefox support */
+.scrollbar-custom {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+}
+
+.scrollbar-custom:hover {
+    scrollbar-color: var(--color-primary-500) var(--color-primary-50);
+}
+
+@layer base {
+    body {
+        @apply bg-[var(--color-mist)] text-slate-900 tracking-tight;
+        font-family: inherit;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+    }
+
+    ::selection {
+        background: rgb(124 58 237 / 0.18);
+        color: var(--color-ink);
+    }
+}
+
+@layer utilities {
+    .glass {
+        @apply bg-white/70 backdrop-blur-xl border border-white/50;
+        box-shadow: var(--shadow-interactive);
+    }
+
+    .grain-overlay {
+        position: relative;
+    }
+
+    .grain-overlay::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        opacity: 0.02;
+        pointer-events: none;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        z-index: 0;
+    }
+
+    .surface-base {
+        @apply bg-white rounded-brand;
+        border: 1px solid rgb(216 206 255 / 0.62);
+        box-shadow: var(--shadow-base);
+    }
+
+    .surface-interactive {
+        @apply bg-white rounded-brand transition-shadow;
+        border: 1px solid rgb(216 206 255 / 0.62);
+        box-shadow: var(--shadow-base);
+    }
+
+    .surface-interactive:hover {
+        box-shadow: var(--shadow-interactive);
+    }
+
+    .surface-elevated {
+        @apply bg-white rounded-brand;
+        border: 1px solid rgb(216 206 255 / 0.5);
+        box-shadow: var(--shadow-elevated);
+    }
+
+    .tracking-tightest {
+        letter-spacing: -0.05em;
+    }
+
+    .landing-page .tracking-tightest {
+        letter-spacing: -0.04em;
+    }
+
+    .landing-page p {
+        font-weight: 400;
+    }
+
+    .shadow-soft {
+        box-shadow: var(--shadow-base);
+    }
+
+    .shadow-hover {
+        box-shadow: var(--shadow-elevated);
+    }
+
+    .card-border {
+        border: 1px solid rgb(216 206 255 / 0.62);
+        box-shadow: var(--shadow-base);
+        transition: box-shadow var(--duration-micro) var(--ease-micro);
+    }
+
+    .card-border:hover {
+        box-shadow: var(--shadow-interactive);
+    }
+
+    .btn-sweep::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(120deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.15) 40%,
+                transparent 60%);
+        transform: translateX(-100%);
+        transition: transform 300ms var(--ease-micro);
+        pointer-events: none;
+    }
+
+    .btn-sweep:hover::after {
+        transform: translateX(100%);
+    }
+
+    .card-lift {
+        transition: box-shadow 180ms ease-out, transform 180ms ease-out;
+    }
+
+    .card-lift:hover {
+        box-shadow: var(--shadow-elevated);
+        transform: translateY(-2px);
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .font-zain {
+        font-family: 'Zain', sans-serif;
+        letter-spacing: 0.01em;
+    }
+
+    .font-montserrat {
+        font-family: 'Montserrat', 'Inter', sans-serif;
+    }
+
+    .color-input-pill {
+        appearance: none;
+        border-radius: 0.75rem;
+        overflow: hidden;
+    }
+
+    .color-input-pill::-webkit-color-swatch-wrapper {
+        padding: 0;
+        border-radius: 0.75rem;
+    }
+
+    .color-input-pill::-webkit-color-swatch {
+        border: 0;
+        border-radius: 0.75rem;
+    }
+
+    .color-input-pill::-moz-color-swatch {
+        border: 0;
+        border-radius: 0.75rem;
+    }
+
+    @keyframes testimonials-marquee {
+        0% {
+            transform: translateX(0);
+        }
+
+        100% {
+            transform: translateX(-50%);
+        }
+    }
+
+    .testimonials-marquee-track {
+        animation: testimonials-marquee 48s linear infinite;
+        will-change: transform;
+    }
+
+    .testimonials-marquee:hover .testimonials-marquee-track {
+        animation-play-state: paused;
+    }
+
+    @keyframes hero-dot-rain {
+        0% {
+            transform: translate3d(0, -8vh, 0);
+            opacity: 0;
+        }
+
+        8% {
+            opacity: 0.95;
+        }
+
+        70% {
+            transform: translate3d(calc(var(--dot-rain-drift, 0px) * 0.72), 70vh, 0);
+            opacity: 0.95;
+        }
+
+        100% {
+            transform: translate3d(var(--dot-rain-drift, 0px), 108vh, 0);
+            opacity: 0;
+        }
+    }
+
+    .hero-rain-dot {
+        animation-name: hero-dot-rain;
+        animation-timing-function: linear;
+        animation-iteration-count: infinite;
+        will-change: transform, opacity;
+    }
+
+    @keyframes cosmos-star-twinkle {
+
+        0%,
+        100% {
+            opacity: 0.2;
+            transform: scale(0.9);
+        }
+
+        50% {
+            opacity: 0.95;
+            transform: scale(1.2);
+        }
+    }
+
+    .cosmos-star {
+        animation: cosmos-star-twinkle 4.6s ease-in-out infinite;
+        will-change: opacity, transform;
+    }
+
+    @keyframes cosmos-comet-pass {
+
+        0%,
+        60% {
+            opacity: 0;
+            transform: translate3d(-40%, 48%, 0) rotate(-24deg);
+        }
+
+        65% {
+            opacity: 0.92;
+        }
+
+        100% {
+            opacity: 0;
+            transform: translate3d(178%, -168%, 0) rotate(-24deg);
+        }
+    }
+
+    .cosmos-comet-trail {
+        animation: cosmos-comet-pass 22s linear infinite;
+        will-change: transform, opacity;
+    }
+
+    @keyframes cosmos-orbit {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .cosmos-orbit-ring {
+        animation: cosmos-orbit 22s linear infinite;
+        will-change: transform;
+    }
+
+    .cosmos-orbit-ring-reverse {
+        animation: cosmos-orbit 30s linear infinite reverse;
+        will-change: transform;
+    }
+
+    @keyframes cosmos-orbit-depth {
+        0% {
+            transform: rotateX(68deg) rotate(0deg);
+        }
+
+        100% {
+            transform: rotateX(68deg) rotate(-360deg);
+        }
+    }
+
+    .cosmos-orbit-ring-depth {
+        animation: cosmos-orbit-depth 30s linear infinite;
+        transform-style: preserve-3d;
+        will-change: transform;
+    }
+
+    @keyframes cosmos-moon-depth {
+
+        0%,
+        100% {
+            transform: scale(0.72);
+            opacity: 0.42;
+            filter: blur(0.9px);
+        }
+
+        25% {
+            transform: scale(0.88);
+            opacity: 0.64;
+            filter: blur(0.6px);
+        }
+
+        50% {
+            transform: scale(1.22);
+            opacity: 1;
+            filter: blur(0);
+        }
+
+        75% {
+            transform: scale(0.9);
+            opacity: 0.66;
+            filter: blur(0.6px);
+        }
+    }
+
+    .cosmos-moon-depth {
+        animation: cosmos-moon-depth 30s linear infinite;
+        transform-origin: center;
+        will-change: transform, opacity, filter;
+    }
+
+    @keyframes cosmos-moon-glow-pulse {
+
+        0%,
+        100% {
+            transform: scale(0.82);
+            opacity: 0.56;
+            box-shadow: 0 0 6px rgba(255, 255, 255, 0.34), 0 0 12px rgba(167, 139, 250, 0.2);
+        }
+
+        50% {
+            transform: scale(1.24);
+            opacity: 1;
+            box-shadow: 0 0 16px rgba(255, 255, 255, 0.92), 0 0 30px rgba(167, 139, 250, 0.45);
+        }
+    }
+
+    .cosmos-moon-glow {
+        animation: cosmos-moon-glow-pulse 3.8s ease-in-out infinite;
+        transform-origin: center;
+        will-change: transform, opacity, box-shadow;
+    }
+
+    .cosmos-orbit-ring-outer {
+        animation: cosmos-orbit 42s linear infinite;
+        will-change: transform;
+    }
+
+    @keyframes bell-swing {
+        0%, 100% { transform: rotate(0); }
+        10% { transform: rotate(10deg); }
+        20% { transform: rotate(-10deg); }
+        30% { transform: rotate(8deg); }
+        40% { transform: rotate(-8deg); }
+        50% { transform: rotate(0); }
+    }
+
+    .animate-bell-swing {
+        animation: bell-swing 2s ease-in-out infinite;
+        transform-origin: top center;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .testimonials-marquee-track {
+        animation: none !important;
+        transform: translateX(0) !important;
+    }
+
+    .hero-rain-dot {
+        animation: none !important;
+    }
+
+    .cosmos-star,
+    .cosmos-comet-trail,
+    .cosmos-orbit-ring,
+    .cosmos-orbit-ring-reverse,
+    .cosmos-orbit-ring-depth,
+    .cosmos-moon-depth,
+    .cosmos-moon-glow,
+    .cosmos-orbit-ring-outer {
+        animation: none !important;
+    }
+}
+
+.workbench-calendar-shell .fc {
+    --fc-border-color: rgb(226 232 240);
+    --fc-page-bg-color: var(--color-surface);
+    --fc-today-bg-color: rgb(248 250 252);
+    --fc-neutral-bg-color: rgb(248 250 252);
+    --fc-button-bg-color: var(--color-surface);
+    --fc-button-border-color: rgb(226 232 240);
+    --fc-button-text-color: rgb(51 65 85);
+    --fc-button-hover-bg-color: rgb(248 250 252);
+    --fc-button-hover-border-color: rgb(203 213 225);
+    --fc-button-active-bg-color: var(--color-primary-600);
+    --fc-button-active-border-color: var(--color-primary-600);
+    --fc-button-active-text-color: var(--color-surface);
+    --fc-event-bg-color: var(--color-primary-600);
+    --fc-event-border-color: var(--color-primary-600);
+}
+
+.workbench-calendar-shell .fc .fc-toolbar-title {
+    color: rgb(15 23 42);
+    font-size: 1.2rem;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+}
+
+.workbench-calendar-shell .fc .fc-toolbar.fc-header-toolbar {
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.85rem;
+}
+
+.workbench-calendar-shell .fc .fc-toolbar-chunk {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.workbench-calendar-shell .fc .fc-col-header-cell-cushion {
+    color: rgb(51 65 85);
+    font-weight: 800;
+    text-decoration: none;
+    display: inline-block;
+    padding: 0.75rem 0.25rem !important;
+}
+
+.workbench-calendar-shell .fc .fc-daygrid-day-number {
+    color: rgb(51 65 85);
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.workbench-calendar-shell .fc .fc-view-harness,
+.workbench-calendar-shell .fc .fc-scroller-harness,
+.workbench-calendar-shell .fc .fc-scroller {
+    overflow: visible !important;
+}
+
+.workbench-calendar-shell .fc .fc-scrollgrid {
+    width: 100% !important;
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.workbench-calendar-shell .fc .fc-daygrid-day-frame {
+    min-height: 96px;
+    padding: 0.35rem;
+}
+
+.content-scheduler-calendar .fc .fc-daygrid-day-frame {
+    position: relative;
+    display: flex;
+    min-height: 180px;
+    max-height: 180px;
+    flex-direction: column;
+}
+
+.content-scheduler-calendar .fc .fc-daygrid-day-top {
+    flex: 0 0 auto;
+}
+
+.content-scheduler-calendar .fc .fc-daygrid-day-events {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    min-height: 0;
+    padding-right: 2px;
+}
+
+.content-scheduler-calendar .fc .fc-daygrid-day-events::-webkit-scrollbar {
+    width: 5px;
+}
+
+.content-scheduler-calendar .fc .fc-daygrid-day-events::-webkit-scrollbar-thumb {
+    background: rgb(148 163 184 / 0.45);
+    border-radius: 9999px;
+}
+
+.content-scheduler-calendar .fc .fc-daygrid-day-events::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.content-scheduler-calendar .fc .fc-daygrid-day-events {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(148 163 184 / 0.45) transparent;
+}
+
+.content-scheduler-calendar .fc .fc-daygrid-day.scheduler-day-past {
+    background: rgb(248 250 252);
+}
+
+.content-scheduler-calendar .fc .fc-daygrid-day.scheduler-day-past .fc-daygrid-day-number {
+    color: rgb(148 163 184);
+}
+
+.content-scheduler-calendar .fc .fc-daygrid-day.scheduler-day-past .scheduler-calendar-card,
+.content-scheduler-calendar .fc .fc-daygrid-day.scheduler-day-past .scheduler-note-card {
+    opacity: 0.72;
+}
+
+.content-scheduler-calendar .scheduler-empty-hint {
+    position: absolute;
+    inset: 2.2rem 0.4rem 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0 0.35rem;
+    color: rgb(100 116 139);
+    font-size: 0.72rem;
+    line-height: 1.15;
+    font-weight: 700;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(4px);
+    transition: opacity 0.18s ease, transform 0.18s ease, visibility 0s linear 0.18s;
+}
+
+.content-scheduler-calendar .fc .fc-daygrid-day:hover .scheduler-empty-hint,
+.content-scheduler-calendar .fc .fc-daygrid-day:focus-within .scheduler-empty-hint {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition-delay: 0.25s, 0.25s, 0s;
+}
+
+.workbench-calendar-shell .fc .fc-button {
+    min-height: 2.5rem;
+    border-radius: 0.875rem;
+    box-shadow: 0 8px 18px rgb(15 23 42 / 0.06);
+    font-weight: 800;
+    text-transform: capitalize;
+}
+
+.workbench-calendar-shell .fc .fc-button-primary:not(:disabled).fc-button-active,
+.workbench-calendar-shell .fc .fc-button-primary:not(:disabled):active,
+.workbench-calendar-shell .fc .fc-today-button:disabled {
+    background-color: var(--color-primary-600);
+    border-color: var(--color-primary-600);
+    box-shadow: none;
+    color: var(--color-surface);
+    opacity: 1;
+}
+
+.workbench-calendar-shell .fc .fc-button:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.workbench-calendar-shell .fc .fc-button:focus-visible {
+    box-shadow: 0 0 0 2px var(--color-surface), 0 0 0 4px var(--color-primary-500);
+}
+
+.workbench-calendar-shell .fc .fc-daygrid-event {
+    background: transparent;
+    border: 0;
+    margin: 0.125rem 0.25rem;
+}
+
+.workbench-calendar-shell .fc .fc-event-main {
+    color: inherit;
+}
+
+.appointment-calendar-shell .fc {
+    --fc-page-bg-color: transparent;
+    --fc-today-bg-color: var(--color-primary-50);
+}
+
+.appointment-calendar-shell .fc .appointment-calendar-day-interactive {
+    position: relative;
+}
+
+.appointment-calendar-day-content {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 9999px;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    margin: 0.35rem 0.35rem 0 0;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.appointment-calendar-day-content:hover {
+    background-color: var(--color-primary-50);
+}
+
+.appointment-calendar-day-content:focus {
+    outline: none;
+}
+
+.appointment-calendar-day-content:focus-visible {
+    outline: 2px solid var(--color-primary-500);
+}
+
+.appointment-calendar-day-number {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: rgb(51 65 85);
+}
+
+.appointment-calendar-day-badge {
+    display: inline-flex;
+    min-width: 1.35rem;
+    height: 1.35rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    background: var(--color-primary-100);
+    color: var(--color-primary-700);
+    font-size: 0.72rem;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.appointment-calendar-shell .fc .appointment-calendar-day-has-bookings {
+    position: relative;
+    background: linear-gradient(180deg, var(--color-primary-50), transparent 55%);
+}
+
+.appointment-calendar-shell .fc .appointment-calendar-day-has-bookings::after {
+    content: attr(data-booking-count);
+    position: absolute;
+    z-index: 2;
+    bottom: 0.45rem;
+    right: 0.45rem;
+    display: inline-flex;
+    min-width: 1.45rem;
+    height: 1.45rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    background: var(--color-primary-100);
+    color: var(--color-primary-700);
+    font-size: 0.74rem;
+    font-weight: 900;
+    line-height: 1;
+    pointer-events: none;
+}
+
+.appointment-calendar-shell .fc .appointment-calendar-day-selected {
+    box-shadow: inset 0 0 0 2px var(--color-primary-600);
+    background: linear-gradient(180deg, var(--color-primary-100), var(--color-primary-50));
+}
+
+@media (max-width: 640px) {
+    .workbench-calendar-shell .fc .fc-toolbar.fc-header-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .workbench-calendar-shell .fc .fc-toolbar-chunk {
+        justify-content: space-between;
+    }
+
+    .workbench-calendar-shell .fc .fc-toolbar-title {
+        font-size: 1.1rem;
+    }
+
+    .workbench-calendar-shell .fc .fc-button {
+        min-height: 2.75rem;
+        padding: 0.45rem 0.7rem;
+    }
+
+    .workbench-calendar-shell .fc .fc-daygrid-day-frame {
+        min-height: 78px;
+        padding: 0.25rem;
+    }
+
+    .content-scheduler-calendar .fc .fc-daygrid-day-frame {
+        min-height: 130px;
+        max-height: 130px;
+    }
+
+    .appointment-calendar-day-number {
+        font-size: 0.95rem;
+    }
+}

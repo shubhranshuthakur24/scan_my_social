@@ -1,0 +1,200 @@
+/* ============================================================
+   Scan My Social   Editorial Intelligence Lab Design Tokens
+   ============================================================ */
+
+:root {
+    /* ── Brand Colors ── */
+    --color-ink: #141022;
+    --color-surface: #FFFFFF;
+    --color-mist: #F7F4FF;
+    --color-muted: #6F6785;
+
+    /* ── Primary   Editorial Violet ── */
+    --color-primary-50: #F5F3FF;
+    --color-primary-100: #EDE9FE;
+    --color-primary-200: #DDD6FE;
+    --color-primary-300: #C4B5FD;
+    --color-primary-400: #A78BFA;
+    --color-primary-500: #8B5CF6;
+    --color-primary-600: #7C3AED;
+    --color-primary-700: #6D28D9;
+    --color-primary-800: #5B21B6;
+    --color-primary-900: #4C1D95;
+
+    /* ── Accent   Electric Rose ── */
+    --color-accent-50: #FFF1F2;
+    --color-accent-100: #FFE4E6;
+    --color-accent-200: #FECDD3;
+    --color-accent-300: #FDA4AF;
+    --color-accent-400: #FB7185;
+    --color-accent-500: #F43F5E;
+    --color-accent-600: #E11D48;
+    --color-accent-700: #BE123C;
+    --color-accent-800: #9F1239;
+    --color-accent-900: #881337;
+
+    /* ── Success ── */
+    --color-success-50: #ECFDF5;
+    --color-success-100: #D1FAE5;
+    --color-success-200: #A7F3D0;
+    --color-success-300: #6EE7B7;
+    --color-success-400: #34D399;
+    --color-success-500: #10B981;
+    --color-success-600: #059669;
+    --color-success-700: #047857;
+    --color-success-800: #065F46;
+    --color-success-900: #064E3B;
+
+    /* ── Warning ── */
+    --color-warning-50: #FFFBEB;
+    --color-warning-100: #FEF3C7;
+    --color-warning-200: #FDE68A;
+    --color-warning-300: #FCD34D;
+    --color-warning-400: #FBBF24;
+    --color-warning-500: #F59E0B;
+    --color-warning-600: #D97706;
+    --color-warning-700: #B45309;
+    --color-warning-800: #92400E;
+    --color-warning-900: #78350F;
+
+    /* ── Danger ── */
+    --color-danger-50: #FEF2F2;
+    --color-danger-100: #FEE2E2;
+    --color-danger-200: #FECACA;
+    --color-danger-300: #FCA5A5;
+    --color-danger-400: #F87171;
+    --color-danger-500: #EF4444;
+    --color-danger-600: #DC2626;
+    --color-danger-700: #B91C1C;
+    --color-danger-800: #991B1B;
+    --color-danger-900: #7F1D1D;
+
+    /* ── Error alias (backwards-compat with existing Tailwind classes) ── */
+    --color-error-50: var(--color-danger-50);
+    --color-error-100: var(--color-danger-100);
+    --color-error-200: var(--color-danger-200);
+    --color-error-300: var(--color-danger-300);
+    --color-error-400: var(--color-danger-400);
+    --color-error-500: var(--color-danger-500);
+    --color-error-600: var(--color-danger-600);
+    --color-error-700: var(--color-danger-700);
+    --color-error-800: var(--color-danger-800);
+    --color-error-900: var(--color-danger-900);
+
+    /* ── Info ── */
+    --color-info-50: #EFF6FF;
+    --color-info-100: #DBEAFE;
+    --color-info-200: #BFDBFE;
+    --color-info-300: #93C5FD;
+    --color-info-400: #60A5FA;
+    --color-info-500: #3B82F6;
+    --color-info-600: #2563EB;
+    --color-info-700: #1D4ED8;
+    --color-info-800: #1E40AF;
+    --color-info-900: #1E3A8A;
+
+    /* ── Typography   Font Families ── */
+    --font-heading: 'Zain', system-ui, -apple-system, sans-serif;
+    --font-body: 'Zain', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+
+    /* ── Typography   Scale ── */
+    --font-size-h1: 2.25rem;
+    --line-height-h1: 2.5rem;
+    --font-size-h2: 1.875rem;
+    --line-height-h2: 2.25rem;
+    --font-size-h3: 1.5rem;
+    --line-height-h3: 2rem;
+    --font-size-h4: 1.25rem;
+    --line-height-h4: 1.75rem;
+    --font-size-h5: 1.125rem;
+    --line-height-h5: 1.75rem;
+    --font-size-h6: 1rem;
+    --line-height-h6: 1.5rem;
+
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-weight-extrabold: 800;
+
+    /* ── Spacing System ── */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-10: 2.5rem;
+    --space-12: 3rem;
+    --space-16: 4rem;
+
+    /* ── Border Radius   Strict system ── */
+    --radius-sm: 0.875rem;
+    --radius-md: 1.125rem;
+    --radius-lg: 1.5rem;
+    --radius-full: 9999px;
+
+    /* ── Elevation   Three-tier ── */
+    --shadow-base: 0 1px 3px 0 rgb(20 16 34 / 0.05), 0 1px 2px -1px rgb(20 16 34 / 0.04);
+    --shadow-interactive: 0 12px 30px -18px rgb(91 33 182 / 0.24), 0 6px 14px -10px rgb(20 16 34 / 0.1);
+    --shadow-elevated: 0 24px 60px -28px rgb(91 33 182 / 0.28), 0 14px 30px -18px rgb(20 16 34 / 0.12);
+    --shadow-modal: 0 36px 80px -36px rgb(91 33 182 / 0.32), 0 18px 36px -22px rgb(20 16 34 / 0.14);
+
+    /* ── Legacy shadow aliases ── */
+    --shadow-sm: var(--shadow-base);
+    --shadow-md: var(--shadow-interactive);
+    --shadow-lg: var(--shadow-elevated);
+    --shadow-hover: var(--shadow-elevated);
+
+    /* ── Motion ── */
+    --ease-micro: cubic-bezier(0.25, 0.1, 0.25, 1);
+    --ease-panel: cubic-bezier(0.32, 0.72, 0, 1);
+    --duration-micro: 150ms;
+    --duration-panel: 260ms;
+}
+
+.h1 {
+    font-family: var(--font-heading);
+    font-size: var(--font-size-h1);
+    line-height: var(--line-height-h1);
+    font-weight: var(--font-weight-extrabold);
+    letter-spacing: -0.025em;
+    color: var(--color-ink);
+}
+
+.h2 {
+    font-family: var(--font-heading);
+    font-size: var(--font-size-h2);
+    line-height: var(--line-height-h2);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: -0.025em;
+    color: var(--color-ink);
+}
+
+.h3 {
+    font-family: var(--font-heading);
+    font-size: var(--font-size-h3);
+    line-height: var(--line-height-h3);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: -0.025em;
+    color: var(--color-ink);
+}
+
+.text-body {
+    font-family: var(--font-body);
+    color: var(--color-muted);
+    line-height: 1.6;
+}
+
+.text-data {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+}
+
+.focus-ring {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--color-surface), 0 0 0 4px var(--color-primary-500);
+}

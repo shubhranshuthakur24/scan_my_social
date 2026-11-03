@@ -1,0 +1,11 @@
+{
+    "agents": [
+        "codex"
+    ],
+    "skills": [
+        "laravel-best-practices",
+        "socialite-development",
+        "inertia-react-development",
+        "tailwindcss-development"
+    ]
+}

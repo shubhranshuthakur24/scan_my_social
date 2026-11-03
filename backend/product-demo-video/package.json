@@ -1,0 +1,26 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "capture:screenshots": "node scripts/capture-real-app-screenshots.mjs",
+    "audio:music": "node scripts/generate-music-bed.mjs",
+    "audio:voiceover": "node scripts/generate-voiceover.mjs",
+    "dev": "remotion studio src/index.ts",
+    "preview": "remotion still src/index.ts ScanMySocialDemo out/preview.png --frame=420",
+    "thumbnail": "remotion still src/index.ts ScanMySocialThumbnail out/thumbnail.png",
+    "render": "remotion render src/index.ts ScanMySocialDemo out/scanmysocial-product-demo.mp4 --codec=h264 --pixel-format=yuv420p",
+    "render:webm": "remotion render src/index.ts ScanMySocialDemo out/scanmysocial-product-demo.webm --codec=vp8"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.424",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "remotion": "^4.0.424"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
+    "playwright": "^1.59.1",
+    "typescript": "^5.4.5"
+  }
+}

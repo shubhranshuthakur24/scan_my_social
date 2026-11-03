@@ -1,0 +1,49 @@
+name: Build and Commit Vite Assets
+
+on:
+  push:
+    branches:
+      - main
+
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  build:
+    # Prevent workflow running on its own auto-commit
+    if: "!contains(github.event.head_commit.message, 'Auto build assets')"
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true   
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Assets
+        run: npm run build
+        env:
+          VITE_PUSHER_APP_KEY: ${{ secrets.VITE_PUSHER_APP_KEY }}
+          VITE_PUSHER_APP_CLUSTER: ${{ secrets.VITE_PUSHER_APP_CLUSTER }}
+          VITE_PUSHER_SCHEME: ${{ secrets.VITE_PUSHER_SCHEME }}
+
+      - name: Commit Build Files
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add -f public/build
+          git commit -m "Auto build assets" || echo "No changes to commit"
+          git push

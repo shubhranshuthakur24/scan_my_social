@@ -1,0 +1,263 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# ScanMySocial — Hardened Production Docker Compose
+#
+# Hardening applied per docs/plans/kvm-docker-hardening-cicd-plan.md:
+#   • All services: no-new-privileges, restart: unless-stopped
+#   • PHP-based services (app/web/horizon/scheduler):
+#       cap_drop: ALL, read_only: true, tmpfs, init: true, mem_limit, cpus
+#   • Data services (mysql/redis): no cap_drop (startup requires setuid)
+#     but still get resource limits and no-new-privileges
+#   • Internal services (mysql/redis): NO host port mappings
+#   • Web port bound exclusively to 127.0.0.1 — Caddy on the host reverse
+#     proxies to 127.0.0.1:8080; the port is never exposed to the internet
+#
+# On production KVM:  docker compose --env-file .env.docker pull && up -d
+# For local dev:      docker compose --env-file .env.docker build && up -d
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  # ── Laravel PHP-FPM ────────────────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      target: app
+      args:
+        VITE_APP_NAME: ${VITE_APP_NAME:-ScanMySocial}
+        VITE_PUSHER_APP_KEY: ${VITE_PUSHER_APP_KEY:-}
+        VITE_PUSHER_APP_CLUSTER: ${VITE_PUSHER_APP_CLUSTER:-ap2}
+        VITE_PUSHER_SCHEME: ${VITE_PUSHER_SCHEME:-https}
+        VITE_RAZORPAY_KEY_ID: ${VITE_RAZORPAY_KEY_ID:-}
+        VITE_NOTIFICATIONS_POLL_SECONDS: ${VITE_NOTIFICATIONS_POLL_SECONDS:-20}
+        VITE_REVERB_APP_KEY: ${VITE_REVERB_APP_KEY:-}
+        VITE_REVERB_HOST: ${VITE_REVERB_HOST:-}
+        VITE_REVERB_PORT: ${VITE_REVERB_PORT:-443}
+        VITE_REVERB_SCHEME: ${VITE_REVERB_SCHEME:-https}
+    # On production KVM the image is pulled from GHCR (built + scanned by CI).
+    # Locally, `docker compose build` tags the built image with this name.
+    image: ghcr.io/gyaanesh/viralyzer-app:${APP_TAG:-latest}
+    env_file:
+      - .env.docker
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - app_storage:/var/www/html/storage
+      - app_bootstrap_cache:/var/www/html/bootstrap/cache
+    # ── Security ──────────────────────────────────────────────────────────────
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    # Root filesystem is read-only. All writes go to named volumes or tmpfs.
+    # Verify every writable path is covered before enabling in production;
+    # see docs/plans/kvm-docker-hardening-cicd-plan.md §4-C for the full list.
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/run
+    # Proper PID 1 (tini) to reap zombie PHP-FPM child processes.
+    init: true
+    restart: unless-stopped
+    # ── Resource limits (Docker Engine cgroups — NOT Swarm deploy.resources) ─
+    mem_limit: 1g
+    cpus: '1.5'
+    # ── Health check ─────────────────────────────────────────────────────────
+    healthcheck:
+      test: ["CMD", "php", "-v"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    networks:
+      - scanmysocial
+
+  # ── Nginx Static & Reverse Proxy ───────────────────────────────────────────
+  web:
+    build:
+      context: .
+      target: web
+      args:
+        VITE_APP_NAME: ${VITE_APP_NAME:-ScanMySocial}
+        VITE_PUSHER_APP_KEY: ${VITE_PUSHER_APP_KEY:-}
+        VITE_PUSHER_APP_CLUSTER: ${VITE_PUSHER_APP_CLUSTER:-ap2}
+        VITE_PUSHER_SCHEME: ${VITE_PUSHER_SCHEME:-https}
+        VITE_RAZORPAY_KEY_ID: ${VITE_RAZORPAY_KEY_ID:-}
+        VITE_NOTIFICATIONS_POLL_SECONDS: ${VITE_NOTIFICATIONS_POLL_SECONDS:-20}
+        VITE_REVERB_APP_KEY: ${VITE_REVERB_APP_KEY:-}
+        VITE_REVERB_HOST: ${VITE_REVERB_HOST:-}
+        VITE_REVERB_PORT: ${VITE_REVERB_PORT:-443}
+        VITE_REVERB_SCHEME: ${VITE_REVERB_SCHEME:-https}
+    image: ghcr.io/gyaanesh/viralyzer-web:${APP_TAG:-latest}
+    depends_on:
+      - app
+    # Port bound to 127.0.0.1 only — Caddy on the host proxies here over TLS.
+    # HTTP_PORT in .env.docker must be "127.0.0.1:8080" (never "0.0.0.0:8080").
+    # Nginx listens on container port 8080 (non-privileged) to support USER nginx.
+    ports:
+      - "${HTTP_PORT:-127.0.0.1:8080}:8080"
+    volumes:
+      - app_storage:/var/www/html/storage:ro
+      - type: tmpfs
+        target: /var/cache/nginx
+        tmpfs:
+          mode: 0777
+      - type: tmpfs
+        target: /var/run
+        tmpfs:
+          mode: 0777
+    # ── Security ──────────────────────────────────────────────────────────────
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp
+    init: true
+    restart: unless-stopped
+    # ── Resource limits ───────────────────────────────────────────────────────
+    mem_limit: 256m
+    cpus: '0.5'
+    # ── Health check — hits Laravel /up through nginx+PHP-FPM ─────────────────
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:8080/up || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    networks:
+      - scanmysocial
+
+  # ── Horizon Queue Manager ──────────────────────────────────────────────────
+  horizon:
+    # No build section — uses the same app image pulled from GHCR by CI.
+    image: ghcr.io/gyaanesh/viralyzer-app:${APP_TAG:-latest}
+    env_file:
+      - .env.docker
+    command: php artisan horizon
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - app_storage:/var/www/html/storage
+      - app_bootstrap_cache:/var/www/html/bootstrap/cache
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/run
+    init: true
+    restart: unless-stopped
+    mem_limit: 1.5g
+    cpus: '0.75'
+    healthcheck:
+      test: ["CMD", "php", "artisan", "horizon:status"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - scanmysocial
+
+  # ── Laravel Scheduler ─────────────────────────────────────────────────────
+  scheduler:
+    image: ghcr.io/gyaanesh/viralyzer-app:${APP_TAG:-latest}
+    env_file:
+      - .env.docker
+    command: docker/scheduler.sh
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - app_storage:/var/www/html/storage
+      - app_bootstrap_cache:/var/www/html/bootstrap/cache
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/run
+    init: true
+    restart: unless-stopped
+    mem_limit: 256m
+    cpus: '0.25'
+    networks:
+      - scanmysocial
+
+  # ── MySQL 8.4 ─────────────────────────────────────────────────────────────
+  mysql:
+    # Pinned to exact patch version — update deliberately after reviewing changelog.
+    image: mysql:8.4.5
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-scanmysocial}
+      MYSQL_USER: ${DB_USERNAME:-scanmysocial}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-change-this-database-password}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-change-this-root-password}
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    # NOTE: cap_drop: ALL is intentionally omitted for mysql and redis.
+    # Both images start as root and use gosu/su-exec to drop to an unprivileged
+    # user. That startup pattern requires CAP_SETUID which would be stripped by
+    # cap_drop: ALL, causing the container to fail to start.
+    security_opt:
+      - no-new-privileges:true
+    # NO ports mapping — mysql is internal only, reachable only via the
+    # scanmysocial Docker bridge network. Exposing port 3306 to the host
+    # would bypass UFW due to Docker's iptables manipulation.
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p${MYSQL_ROOT_PASSWORD:-change-this-root-password}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: unless-stopped
+    mem_limit: 512m
+    cpus: '0.5'
+    networks:
+      - scanmysocial
+
+  # ── Redis 7 ──────────────────────────────────────────────────────────────
+  redis:
+    # Pinned to exact patch version.
+    image: redis:7.4-alpine
+    # REDIS_PASSWORD must be set in .env.docker — never run Redis without auth.
+    command: redis-server --requirepass "${REDIS_PASSWORD:-change-this-redis-password}" --appendonly yes
+    security_opt:
+      - no-new-privileges:true
+    # NO ports mapping — redis is internal only.
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-change-this-redis-password}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    mem_limit: 128m
+    cpus: '0.25'
+    networks:
+      - scanmysocial
+
+volumes:
+  app_storage:
+  app_bootstrap_cache:
+  mysql_data:
+  redis_data:
+
+networks:
+  scanmysocial:
+    driver: bridge

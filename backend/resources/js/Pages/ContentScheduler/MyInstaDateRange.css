@@ -1,0 +1,61 @@
+.my-insta-date-range-calendar .rdrCalendarWrapper {
+    width: 100%;
+    font-size: 11px;
+}
+
+.my-insta-date-range-calendar .rdrMonths {
+    gap: 0.35rem;
+}
+
+.my-insta-date-range-calendar .rdrMonth {
+    width: 22.75em;
+    padding: 0 0.5em 0.75em;
+}
+
+.my-insta-date-range-calendar .rdrMonthAndYearWrapper {
+    height: 44px;
+    padding-top: 2px;
+}
+
+.my-insta-date-range-calendar .rdrMonthAndYearPickers select {
+    padding: 6px 26px 6px 8px;
+}
+
+.my-insta-date-range-calendar .rdrWeekDays {
+    padding: 0 0.25em;
+}
+
+.my-insta-date-range-calendar .rdrWeekDay {
+    line-height: 2.2em;
+    font-size: 0.86em;
+}
+
+.my-insta-date-range-calendar .rdrDay {
+    height: 2.5em;
+    line-height: 2.5em;
+}
+
+.my-insta-date-range-calendar .rdrDayNumber {
+    top: 3px;
+    bottom: 3px;
+}
+
+.my-insta-date-range-calendar .rdrNextPrevButton {
+    margin: 0 0.45em;
+}
+
+.my-insta-date-range-calendar .rdrMonthPicker,
+.my-insta-date-range-calendar .rdrYearPicker {
+    margin: 0 2px;
+}
+
+@media (max-width: 1280px) {
+    .my-insta-date-range-calendar .rdrMonthsHorizontal > div > div > div {
+        flex-wrap: wrap;
+    }
+
+    .my-insta-date-range-calendar .rdrMonth {
+        width: 100%;
+        max-width: 23em;
+    }
+}

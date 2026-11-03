@@ -1,0 +1,61 @@
+.analytics-date-range-calendar .rdrCalendarWrapper {
+    width: 100%;
+    font-size: 11px;
+}
+
+.analytics-date-range-calendar .rdrMonths {
+    gap: 0.35rem;
+}
+
+.analytics-date-range-calendar .rdrMonth {
+    width: 22.75em;
+    padding: 0 0.5em 0.75em;
+}
+
+.analytics-date-range-calendar .rdrMonthAndYearWrapper {
+    height: 44px;
+    padding-top: 2px;
+}
+
+.analytics-date-range-calendar .rdrMonthAndYearPickers select {
+    padding: 6px 26px 6px 8px;
+}
+
+.analytics-date-range-calendar .rdrWeekDays {
+    padding: 0 0.25em;
+}
+
+.analytics-date-range-calendar .rdrWeekDay {
+    line-height: 2.2em;
+    font-size: 0.86em;
+}
+
+.analytics-date-range-calendar .rdrDay {
+    height: 2.5em;
+    line-height: 2.5em;
+}
+
+.analytics-date-range-calendar .rdrDayNumber {
+    top: 3px;
+    bottom: 3px;
+}
+
+.analytics-date-range-calendar .rdrNextPrevButton {
+    margin: 0 0.45em;
+}
+
+.analytics-date-range-calendar .rdrMonthPicker,
+.analytics-date-range-calendar .rdrYearPicker {
+    margin: 0 2px;
+}
+
+@media (max-width: 1280px) {
+    .analytics-date-range-calendar .rdrMonthsHorizontal > div > div > div {
+        flex-wrap: wrap;
+    }
+
+    .analytics-date-range-calendar .rdrMonth {
+        width: 100%;
+        max-width: 23em;
+    }
+}

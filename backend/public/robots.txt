@@ -1,0 +1,15 @@
+User-agent: *
+Disallow: /dashboard
+Disallow: /videos
+Disallow: /channels
+Disallow: /projects
+Disallow: /watchlists
+Disallow: /scripts
+Disallow: /autodm
+Allow: /autodm/terms
+Disallow: /settings
+Disallow: /profile
+Disallow: /api
+Disallow: /recent-activity
+
+Sitemap: https://scanmysocial.com/sitemap.xml

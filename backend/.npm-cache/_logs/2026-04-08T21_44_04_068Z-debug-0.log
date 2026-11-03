@@ -1,0 +1,68 @@
+0 verbose cli C:\Program Files\nodejs\node.exe C:\Program Files\nodejs\node_modules\npm\bin\npm-cli.js
+1 info using npm@11.6.2
+2 info using node@v24.12.0
+3 silly config load:file:C:\Program Files\nodejs\node_modules\npm\npmrc
+4 silly config load:file:D:\Projects\Viralyzer\.npmrc
+5 silly config load:file:C:\Users\Cypher\.npmrc
+6 silly config load:file:C:\Users\Cypher\AppData\Roaming\npm\etc\npmrc
+7 verbose title npm install three @react-three/fiber@8
+8 verbose argv "install" "three" "@react-three/fiber@8"
+9 verbose logfile logs-max:10 dir:d:\Projects\Viralyzer\.npm-cache\_logs\2026-04-08T21_44_04_068Z-
+10 verbose logfile d:\Projects\Viralyzer\.npm-cache\_logs\2026-04-08T21_44_04_068Z-debug-0.log
+11 silly logfile done cleaning log files
+12 silly packumentCache heap:4496293888 maxSize:1124073472 maxEntrySize:562036736
+13 http fetch GET https://registry.npmjs.org/npm attempt 1 failed with EACCES
+14 silly idealTree buildDeps
+15 silly fetch manifest three@*
+16 silly packumentCache full:https://registry.npmjs.org/three cache-miss
+17 http fetch GET https://registry.npmjs.org/three attempt 1 failed with EACCES
+18 http fetch GET https://registry.npmjs.org/npm attempt 2 failed with EACCES
+19 http fetch GET https://registry.npmjs.org/three attempt 2 failed with EACCES
+20 http fetch GET https://registry.npmjs.org/npm attempt 3 failed with EACCES
+21 http fetch GET https://registry.npmjs.org/three attempt 3 failed with EACCES
+22 silly fetch manifest @react-three/fiber@8
+23 silly packumentCache full:https://registry.npmjs.org/@react-three%2ffiber cache-miss
+24 http fetch GET https://registry.npmjs.org/@react-three%2ffiber attempt 1 failed with EACCES
+25 http fetch GET https://registry.npmjs.org/@react-three%2ffiber attempt 2 failed with EACCES
+26 http fetch GET https://registry.npmjs.org/@react-three%2ffiber attempt 3 failed with EACCES
+27 silly placeDep ROOT @react-three/fiber@ OK for:  want: 8
+28 silly placeDep ROOT three@ OK for:  want: *
+29 verbose type system
+30 verbose stack FetchError: request to https://registry.npmjs.org/@react-three%2ffiber failed, reason: 
+30 verbose stack     at ClientRequest.<anonymous> (C:\Program Files\nodejs\node_modules\npm\node_modules\minipass-fetch\lib\index.js:130:14)
+30 verbose stack     at ClientRequest.emit (node:events:508:28)
+30 verbose stack     at emitErrorEvent (node:_http_client:108:11)
+30 verbose stack     at _destroy (node:_http_client:962:9)
+30 verbose stack     at onSocketNT (node:_http_client:982:5)
+30 verbose stack     at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+31 error code EACCES
+32 error errno EACCES
+33 error FetchError: request to https://registry.npmjs.org/@react-three%2ffiber failed, reason: 
+33 error     at ClientRequest.<anonymous> (C:\Program Files\nodejs\node_modules\npm\node_modules\minipass-fetch\lib\index.js:130:14)
+33 error     at ClientRequest.emit (node:events:508:28)
+33 error     at emitErrorEvent (node:_http_client:108:11)
+33 error     at _destroy (node:_http_client:962:9)
+33 error     at onSocketNT (node:_http_client:982:5)
+33 error     at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+33 error   code: 'EACCES',
+33 error   errno: 'EACCES',
+33 error   type: 'system',
+33 error   requiredBy: '.'
+33 error }
+34 error
+34 error The operation was rejected by your operating system.
+34 error It's possible that the file was already in use (by a text editor or antivirus),
+34 error or that you lack permissions to access it.
+34 error
+34 error If you believe this might be a permissions issue, please double-check the
+34 error permissions of the file and its containing directories, or try running
+34 error the command again as root/Administrator.
+35 silly unfinished npm timer reify 1775684644477
+36 silly unfinished npm timer reify:loadTrees 1775684644479
+37 verbose cwd D:\Projects\Viralyzer
+38 verbose os Windows_NT 10.0.19045
+39 verbose node v24.12.0
+40 verbose npm  v11.6.2
+41 verbose exit 1
+42 verbose code 1
+43 error A complete log of this run can be found in: d:\Projects\Viralyzer\.npm-cache\_logs\2026-04-08T21_44_04_068Z-debug-0.log

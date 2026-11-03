@@ -1,0 +1,202 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sora:wght@400;600;700;800;900&family=Zain:wght@300;400;700;800;900&display=swap');
+@import "tailwindcss";
+
+:root {
+  --font-sans: 'DM Sans', 'Inter', system-ui, sans-serif;
+  --font-heading: 'Sora', system-ui, sans-serif;
+  --font-montserrat: 'Montserrat', 'Inter', sans-serif;
+  --font-zain: 'Zain', sans-serif;
+
+  --color-ink: #141022;
+  --color-surface: #ffffff;
+  --color-mist: #F7F4FF;
+  --color-muted: #6F6785;
+
+  /* Primary Editorial Violet */
+  --color-primary-50: #F5F3FF;
+  --color-primary-100: #EDE9FE;
+  --color-primary-200: #DDD6FE;
+  --color-primary-300: #C4B5FD;
+  --color-primary-400: #A78BFA;
+  --color-primary-500: #8B5CF6;
+  --color-primary-600: #7C3AED;
+  --color-primary-700: #6D28D9;
+  --color-primary-800: #5B21B6;
+  --color-primary-900: #4C1D95;
+
+  /* Accent Electric Rose */
+  --color-accent-50: #FFF1F2;
+  --color-accent-100: #FFE4E6;
+  --color-accent-200: #FECDD3;
+  --color-accent-300: #FDA4AF;
+  --color-accent-400: #FB7185;
+  --color-accent-500: #F43F5E;
+  --color-accent-600: #E11D48;
+  --color-accent-700: #BE123C;
+
+  /* Status Colors */
+  --color-success-500: #10B981;
+  --color-success-50: #ECFDF5;
+  --color-warning-500: #F59E0B;
+  --color-warning-50: #FFFBEB;
+  --color-danger-500: #EF4444;
+  --color-danger-50: #FEF2F2;
+
+  --shadow-base: 0 2px 8px -2px rgba(124, 58, 237, 0.08), 0 1px 4px -1px rgba(0, 0, 0, 0.04);
+  --shadow-interactive: 0 8px 24px -4px rgba(124, 58, 237, 0.16), 0 2px 8px -2px rgba(0, 0, 0, 0.06);
+  --shadow-elevated: 0 16px 36px -6px rgba(124, 58, 237, 0.20), 0 4px 12px -2px rgba(0, 0, 0, 0.08);
+
+  --radius-brand-sm: 14px;
+  --radius-brand: 18px;
+  --radius-brand-lg: 24px;
+}
+
+@theme {
+  --font-sans: 'DM Sans', 'Inter', system-ui, sans-serif;
+  --font-heading: 'Sora', system-ui, sans-serif;
+  --font-montserrat: 'Montserrat', 'Inter', sans-serif;
+  --font-zain: 'Zain', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --color-primary-50: #F5F3FF;
+  --color-primary-100: #EDE9FE;
+  --color-primary-200: #DDD6FE;
+  --color-primary-300: #C4B5FD;
+  --color-primary-400: #A78BFA;
+  --color-primary-500: #8B5CF6;
+  --color-primary-600: #7C3AED;
+  --color-primary-700: #6D28D9;
+  --color-primary-800: #5B21B6;
+  --color-primary-900: #4C1D95;
+
+  --color-accent-50: #FFF1F2;
+  --color-accent-100: #FFE4E6;
+  --color-accent-200: #FECDD3;
+  --color-accent-300: #FDA4AF;
+  --color-accent-400: #FB7185;
+  --color-accent-500: #F43F5E;
+  --color-accent-600: #E11D48;
+  --color-accent-700: #BE123C;
+
+  --color-mist: #F7F4FF;
+  --color-ink: #141022;
+}
+
+.font-montserrat,
+.font-monserrat {
+  font-family: 'Montserrat', 'Inter', sans-serif;
+}
+
+.font-zain {
+  font-family: 'Zain', sans-serif;
+}
+
+.font-sora {
+  font-family: 'Sora', sans-serif;
+}
+
+body {
+  background-color: var(--color-mist);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Utilities */
+.glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(216, 206, 255, 0.5);
+  box-shadow: var(--shadow-base);
+}
+
+.surface-base {
+  background-color: #ffffff;
+  border-radius: var(--radius-brand);
+  border: 1px solid rgba(216, 206, 255, 0.62);
+  box-shadow: var(--shadow-base);
+}
+
+.surface-interactive {
+  background-color: #ffffff;
+  border-radius: var(--radius-brand);
+  border: 1px solid rgba(216, 206, 255, 0.62);
+  box-shadow: var(--shadow-base);
+  transition: all 0.2s ease-out;
+}
+
+.surface-interactive:hover {
+  box-shadow: var(--shadow-interactive);
+  transform: translateY(-1px);
+}
+
+.btn-sweep {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-sweep::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.22) 40%, transparent 60%);
+  transform: translateX(-100%);
+  transition: transform 400ms ease;
+  pointer-events: none;
+}
+
+.btn-sweep:hover::after {
+  transform: translateX(100%);
+}
+
+/* Custom Scrollbar */
+.scrollbar-custom::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.3);
+  border-radius: 9999px;
+}
+
+.scrollbar-custom:hover::-webkit-scrollbar-thumb {
+  background: rgba(124, 58, 237, 0.6);
+}
+
+/* Primary Brand Scrollbar (Horizontal & Vertical) */
+.scrollbar-primary {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-primary-600) rgba(15, 23, 42, 0.7);
+}
+
+.scrollbar-primary::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+
+.scrollbar-primary::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.7);
+}
+
+.scrollbar-primary::-webkit-scrollbar-thumb {
+  background: var(--color-primary-600);
+  border-radius: 9999px;
+  transition: background-color 0.2s ease;
+}
+
+.scrollbar-primary::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-500);
+}
+
+.scrollbar-primary::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
