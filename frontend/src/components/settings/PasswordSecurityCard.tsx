@@ -67,30 +67,25 @@ export default function PasswordSecurityCard({ onToast }: PasswordSecurityCardPr
     setPasswordError('');
   };
 
+  const isChanged =
+    currentPassword.length > 0 ||
+    newPassword.length > 0 ||
+    confirmPassword.length > 0;
+
+  const isValid =
+    currentPassword.length > 0 &&
+    newPassword.length >= 8 &&
+    getPasswordRuleErrors(newPassword).length === 0 &&
+    newPassword === confirmPassword;
+
+  const isUpdatePasswordActive = isChanged && isValid && !isSubmittingPassword;
+
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isUpdatePasswordActive) {
+      return;
+    }
     setPasswordError('');
-
-    if (!currentPassword) {
-      triggerPasswordError('Please enter your current password.');
-      return;
-    }
-    if (!newPassword) {
-      triggerPasswordError('Please enter a new password.');
-      return;
-    }
-
-    const passwordRuleErrors = getPasswordRuleErrors(newPassword);
-    if (passwordRuleErrors.length > 0) {
-      triggerPasswordError(`New password does not meet security requirements:\n• ${passwordRuleErrors.join('\n• ')}`);
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      triggerPasswordError('New password and confirm password do not match.');
-      return;
-    }
-
     setIsSubmittingPassword(true);
     try {
       await updateUserPassword({
@@ -103,8 +98,9 @@ export default function PasswordSecurityCard({ onToast }: PasswordSecurityCardPr
       setSavedPassword(true);
       onToast('Password updated successfully!');
       setTimeout(() => setSavedPassword(false), 3000);
-    } catch (err: any) {
-      triggerPasswordError(err.message || 'Failed to update password.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to update password.';
+      triggerPasswordError(msg);
     } finally {
       setIsSubmittingPassword(false);
     }
@@ -237,8 +233,16 @@ export default function PasswordSecurityCard({ onToast }: PasswordSecurityCardPr
         <div className="flex items-center justify-end gap-3 pt-2">
           <Button
             type="submit"
-            disabled={isSubmittingPassword}
-            icon={savedPassword ? <CheckCircle2 size={16} /> : <ShieldCheck size={16} />}
+            disabled={!isUpdatePasswordActive}
+            variant={isUpdatePasswordActive ? 'primary' : 'secondary'}
+            className={
+              savedPassword
+                ? '!bg-emerald-50 !text-emerald-700 !border-emerald-200 !shadow-none !cursor-default disabled:!opacity-100'
+                : !isUpdatePasswordActive
+                ? '!bg-slate-200 !text-slate-400 !border-slate-200 !shadow-none !cursor-not-allowed hover:!bg-slate-200 hover:!text-slate-400 hover:!translate-y-0 active:!scale-100 disabled:!opacity-100'
+                : ''
+            }
+            icon={savedPassword ? <CheckCircle2 size={16} className="text-emerald-600" /> : <ShieldCheck size={16} />}
           >
             {isSubmittingPassword ? 'Updating Password...' : savedPassword ? 'Password Updated!' : 'Update Password'}
           </Button>

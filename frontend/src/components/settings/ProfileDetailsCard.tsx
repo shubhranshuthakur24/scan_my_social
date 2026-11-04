@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Button from '@/components/ui/Button';
 import { useAuthStore } from '@/lib/store/useAuthStore';
-import { updateUserProfile, uploadUserAvatar, removeUserAvatar } from '@/lib/api/authService';
+import { updateUserProfile, uploadUserAvatar, removeUserAvatar, getUserSettings } from '@/lib/api/authService';
 import { User, Camera, Sparkles, RefreshCw, Trash2, CheckCircle2 } from 'lucide-react';
 import BioImageCropModal from '@/components/social-bio-links/BioImageCropModal';
 
@@ -15,14 +15,64 @@ export default function ProfileDetailsCard({ onToast }: ProfileDetailsCardProps)
   const { user, updateUser } = useAuthStore();
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
+  const [initialValues, setInitialValues] = useState({
+    name: user?.name || '',
+    email: user?.email || '',
+    bio: user?.bio || '',
+  });
   const [fullName, setFullName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
-  const [bio, setBio] = useState('');
+  const [bio, setBio] = useState(user?.bio || '');
   const [avatarUrl, setAvatarUrl] = useState(user?.avatar || '');
+  const [hasUserEdited, setHasUserEdited] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [savedProfile, setSavedProfile] = useState(false);
   const [profileError, setProfileError] = useState('');
   const [isSubmittingProfile, setIsSubmittingProfile] = useState(false);
+
+  // Fetch latest user details on mount to guarantee fresh name, email, bio
+  useEffect(() => {
+    let isMounted = true;
+    getUserSettings()
+      .then((data) => {
+        if (!isMounted) return;
+        if (data.user) {
+          const sName = data.user.name || '';
+          const sEmail = data.user.email || '';
+          const sBio = data.user.bio || '';
+          if (!hasUserEdited) {
+            setFullName(sName);
+            setEmail(sEmail);
+            setBio(sBio);
+            setInitialValues({
+              name: sName,
+              email: sEmail,
+              bio: sBio,
+            });
+          }
+          if (data.user.avatar) {
+            setAvatarUrl(data.user.avatar);
+          }
+          updateUser(data.user);
+        }
+      })
+      .catch(() => {
+        // Silently retain auth store user data if settings API is offline
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [hasUserEdited, updateUser]);
+
+  // Determine if fields have been modified compared to original/saved values
+  const isChanged =
+    fullName !== initialValues.name ||
+    email !== initialValues.email ||
+    bio !== initialValues.bio;
+
+  const isValid = fullName.trim().length > 0 && email.trim().length > 0;
+  const isSaveActive = isChanged && isValid && !isSubmittingProfile;
 
   // Image Cropping Modal State (Avatar 1:1 circular)
   const [cropModalState, setCropModalState] = useState<{
@@ -70,8 +120,9 @@ export default function ProfileDetailsCard({ onToast }: ProfileDetailsCardProps)
         updateUser({ avatar: res.avatar_url });
         onToast('Profile avatar updated successfully!');
       }
-    } catch (err: any) {
-      onToast(err.message || 'Failed to upload avatar.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to upload avatar.';
+      onToast(msg);
     } finally {
       setIsUploadingAvatar(false);
       handleCloseCropModal();
@@ -92,8 +143,9 @@ export default function ProfileDetailsCard({ onToast }: ProfileDetailsCardProps)
       setAvatarUrl('');
       updateUser({ avatar: '' });
       onToast('Avatar removed.');
-    } catch (err: any) {
-      onToast(err.message || 'Failed to remove avatar.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to remove avatar.';
+      onToast(msg);
     } finally {
       setIsUploadingAvatar(false);
     }
@@ -101,23 +153,33 @@ export default function ProfileDetailsCard({ onToast }: ProfileDetailsCardProps)
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isSaveActive) {
+      return;
+    }
     setProfileError('');
     setIsSubmittingProfile(true);
 
     try {
       const res = await updateUserProfile({
-        name: fullName,
-        email,
+        name: fullName.trim(),
+        email: email.trim(),
         bio,
       });
       if (res.user) {
         updateUser(res.user);
       }
+      setInitialValues({
+        name: fullName.trim(),
+        email: email.trim(),
+        bio,
+      });
+      setHasUserEdited(false);
       setSavedProfile(true);
       onToast('Profile details updated successfully!');
       setTimeout(() => setSavedProfile(false), 2000);
-    } catch (err: any) {
-      setProfileError(err.message || 'Failed to update profile.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to update profile.';
+      setProfileError(msg);
     } finally {
       setIsSubmittingProfile(false);
     }
@@ -200,7 +262,10 @@ export default function ProfileDetailsCard({ onToast }: ProfileDetailsCardProps)
             <input
               type="text"
               value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
+              onChange={(e) => {
+                setFullName(e.target.value);
+                setHasUserEdited(true);
+              }}
               className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-hidden focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
               placeholder="Your Full Name"
               required
@@ -212,7 +277,10 @@ export default function ProfileDetailsCard({ onToast }: ProfileDetailsCardProps)
             <input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setHasUserEdited(true);
+              }}
               className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-hidden focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
               placeholder="you@example.com"
               required
@@ -224,7 +292,10 @@ export default function ProfileDetailsCard({ onToast }: ProfileDetailsCardProps)
           <label className="block text-xs font-bold text-slate-700 mb-1.5">Bio / Organization</label>
           <textarea
             value={bio}
-            onChange={(e) => setBio(e.target.value)}
+            onChange={(e) => {
+              setBio(e.target.value);
+              setHasUserEdited(true);
+            }}
             rows={3}
             className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-hidden focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
             placeholder="Tell us about your brand, agency, or content creation goals..."
@@ -234,8 +305,16 @@ export default function ProfileDetailsCard({ onToast }: ProfileDetailsCardProps)
         <div className="flex items-center justify-end gap-3 pt-2">
           <Button
             type="submit"
-            disabled={isSubmittingProfile}
-            icon={savedProfile ? <CheckCircle2 size={16} /> : <Sparkles size={16} />}
+            disabled={!isSaveActive}
+            variant={isSaveActive ? 'primary' : 'secondary'}
+            className={
+              savedProfile
+                ? '!bg-emerald-50 !text-emerald-700 !border-emerald-200 !shadow-none !cursor-default disabled:!opacity-100'
+                : !isSaveActive
+                ? '!bg-slate-200 !text-slate-400 !border-slate-200 !shadow-none !cursor-not-allowed hover:!bg-slate-200 hover:!text-slate-400 hover:!translate-y-0 active:!scale-100 disabled:!opacity-100'
+                : ''
+            }
+            icon={savedProfile ? <CheckCircle2 size={16} className="text-emerald-600" /> : <Sparkles size={16} />}
           >
             {isSubmittingProfile ? 'Saving Changes...' : savedProfile ? 'Saved!' : 'Save Profile Changes'}
           </Button>

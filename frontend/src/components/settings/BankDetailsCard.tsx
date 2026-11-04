@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
-import { updateBankDetails } from '@/lib/api/authService';
+import { updateBankDetails, getUserSettings } from '@/lib/api/authService';
 import { Building2, Sparkles, CheckCircle2, AlertTriangle } from 'lucide-react';
 
 interface BankDetailsCardProps {
@@ -11,17 +11,58 @@ interface BankDetailsCardProps {
 }
 
 export default function BankDetailsCard({ onToast }: BankDetailsCardProps) {
+  const [initialValues, setInitialValues] = useState({
+    bankName: '',
+    accountHolder: '',
+    accountNumber: '',
+    routingNumber: '',
+  });
+
   const [bankName, setBankName] = useState('');
   const [accountHolder, setAccountHolder] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
   const [routingNumber, setRoutingNumber] = useState('');
+  const [hasUserEdited, setHasUserEdited] = useState(false);
 
-  const [isBankDirty, setIsBankDirty] = useState(false);
   const [isSubmittingBank, setIsSubmittingBank] = useState(false);
   const [savedBank, setSavedBank] = useState(false);
   const [bankError, setBankError] = useState('');
 
   const bankErrorTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Fetch saved bank details on mount
+  useEffect(() => {
+    let isMounted = true;
+    getUserSettings()
+      .then((data) => {
+        if (!isMounted) return;
+        if (data.bankDetails) {
+          const bName = data.bankDetails.bank_name || '';
+          const bHolder = data.bankDetails.account_holder_name || '';
+          const bNumber = data.bankDetails.account_number || '';
+          const bRouting = data.bankDetails.ifsc_code || '';
+          if (!hasUserEdited) {
+            setBankName(bName);
+            setAccountHolder(bHolder);
+            setAccountNumber(bNumber);
+            setRoutingNumber(bRouting);
+            setInitialValues({
+              bankName: bName,
+              accountHolder: bHolder,
+              accountNumber: bNumber,
+              routingNumber: bRouting,
+            });
+          }
+        }
+      })
+      .catch(() => {
+        // Silently retain state if offline
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [hasUserEdited]);
 
   const triggerBankError = (msg: string) => {
     setBankError(msg);
@@ -35,29 +76,47 @@ export default function BankDetailsCard({ onToast }: BankDetailsCardProps) {
     }
   };
 
+  const isChanged =
+    bankName !== initialValues.bankName ||
+    accountHolder !== initialValues.accountHolder ||
+    accountNumber !== initialValues.accountNumber ||
+    routingNumber !== initialValues.routingNumber;
+
+  const isValid =
+    bankName.trim().length > 0 &&
+    accountHolder.trim().length > 0 &&
+    accountNumber.trim().length > 0 &&
+    routingNumber.trim().length > 0;
+
+  const isSaveBankActive = isChanged && isValid && !isSubmittingBank;
+
   const handleSaveBank = async (e: React.FormEvent) => {
     e.preventDefault();
-    setBankError('');
-
-    if (!bankName.trim() || !accountHolder.trim() || !accountNumber.trim() || !routingNumber.trim()) {
-      triggerBankError('Please fill in all bank payout details before saving.');
+    if (!isSaveBankActive) {
       return;
     }
-
+    setBankError('');
     setIsSubmittingBank(true);
     try {
       await updateBankDetails({
-        bank_name: bankName,
-        account_holder_name: accountHolder,
-        account_number: accountNumber,
-        ifsc_code: routingNumber,
+        bank_name: bankName.trim(),
+        account_holder_name: accountHolder.trim(),
+        account_number: accountNumber.trim(),
+        ifsc_code: routingNumber.trim(),
       });
-      setIsBankDirty(false);
+      setInitialValues({
+        bankName: bankName.trim(),
+        accountHolder: accountHolder.trim(),
+        accountNumber: accountNumber.trim(),
+        routingNumber: routingNumber.trim(),
+      });
+      setHasUserEdited(false);
       setSavedBank(true);
       onToast('Payout bank details updated successfully!');
       setTimeout(() => setSavedBank(false), 3000);
-    } catch (err: any) {
-      triggerBankError(err.message || 'Failed to update bank details.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to update bank details.';
+      triggerBankError(msg);
     } finally {
       setIsSubmittingBank(false);
     }
@@ -76,7 +135,7 @@ export default function BankDetailsCard({ onToast }: BankDetailsCardProps) {
           </div>
         </div>
 
-        {isBankDirty && (
+        {isChanged && (
           <Badge variant="warning" className="animate-pulse">
             Unsaved Changes
           </Badge>
@@ -99,7 +158,7 @@ export default function BankDetailsCard({ onToast }: BankDetailsCardProps) {
               value={bankName}
               onChange={(e) => {
                 setBankName(e.target.value);
-                setIsBankDirty(true);
+                setHasUserEdited(true);
               }}
               className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-hidden focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
               placeholder="e.g., HDFC Bank"
@@ -114,7 +173,7 @@ export default function BankDetailsCard({ onToast }: BankDetailsCardProps) {
               value={accountHolder}
               onChange={(e) => {
                 setAccountHolder(e.target.value);
-                setIsBankDirty(true);
+                setHasUserEdited(true);
               }}
               className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-hidden focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
               placeholder="Full name as on bank account"
@@ -129,7 +188,7 @@ export default function BankDetailsCard({ onToast }: BankDetailsCardProps) {
               value={accountNumber}
               onChange={(e) => {
                 setAccountNumber(e.target.value);
-                setIsBankDirty(true);
+                setHasUserEdited(true);
               }}
               className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-hidden focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
               placeholder="•••• •••• •••• 9876"
@@ -144,7 +203,7 @@ export default function BankDetailsCard({ onToast }: BankDetailsCardProps) {
               value={routingNumber}
               onChange={(e) => {
                 setRoutingNumber(e.target.value);
-                setIsBankDirty(true);
+                setHasUserEdited(true);
               }}
               className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-hidden focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all uppercase"
               placeholder="HDFC0001234 / 123456789"
@@ -156,8 +215,16 @@ export default function BankDetailsCard({ onToast }: BankDetailsCardProps) {
         <div className="flex items-center justify-end gap-3 pt-2">
           <Button
             type="submit"
-            disabled={isSubmittingBank}
-            icon={savedBank ? <CheckCircle2 size={16} /> : <Sparkles size={16} />}
+            disabled={!isSaveBankActive}
+            variant={isSaveBankActive ? 'primary' : 'secondary'}
+            className={
+              savedBank
+                ? '!bg-emerald-50 !text-emerald-700 !border-emerald-200 !shadow-none !cursor-default disabled:!opacity-100'
+                : !isSaveBankActive
+                ? '!bg-slate-200 !text-slate-400 !border-slate-200 !shadow-none !cursor-not-allowed hover:!bg-slate-200 hover:!text-slate-400 hover:!translate-y-0 active:!scale-100 disabled:!opacity-100'
+                : ''
+            }
+            icon={savedBank ? <CheckCircle2 size={16} className="text-emerald-600" /> : <Sparkles size={16} />}
           >
             {isSubmittingBank ? 'Saving Bank Details...' : savedBank ? 'Saved!' : 'Save Payout Details'}
           </Button>

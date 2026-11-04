@@ -8,6 +8,7 @@ export interface User {
   role: 'user' | 'super_admin';
   plan: 'free' | 'pro';
   avatar?: string;
+  bio?: string;
   affiliate_status?: string;
 }
 
