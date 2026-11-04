@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\MetaWebhookController;
 use App\Http\Controllers\Api\PublicFormApiController;
 use App\Http\Controllers\Api\SettingsApiController;
 use App\Http\Controllers\Api\SubscriptionApiController;
+use App\Http\Controllers\Api\WebPageApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -99,11 +100,25 @@ Route::prefix('v1')->group(function () {
         Route::get('/lead-forms/{id}/submissions/export', [LeadFormApiController::class, 'exportSubmissions']);
         Route::post('/lead-forms/{id}/cover', [LeadFormApiController::class, 'uploadCover']);
         Route::delete('/lead-forms/{id}/cover', [LeadFormApiController::class, 'removeCover']);
+
+        // Web Pages & Templates Catalog API
+        Route::get('/web-pages/catalog', [WebPageApiController::class, 'catalog']);
+        Route::get('/web-pages', [WebPageApiController::class, 'index']);
+        Route::post('/web-pages', [WebPageApiController::class, 'store']);
+        Route::get('/web-pages/{id}', [WebPageApiController::class, 'show']);
+        Route::put('/web-pages/{id}', [WebPageApiController::class, 'update']);
+        Route::patch('/web-pages/{id}/publish', [WebPageApiController::class, 'togglePublish']);
+        Route::delete('/web-pages/{id}', [WebPageApiController::class, 'destroy']);
     });
 
     // 2. Public Lead Forms (Unauthenticated, Throttled)
     Route::get('/public/forms/{publicId}', [PublicFormApiController::class, 'show'])->middleware('throttle:100,1');
     Route::post('/public/forms/{publicId}/submit', [PublicFormApiController::class, 'submit'])->middleware('throttle:40,1');
+
+    // 3. Public Web Pages (Unauthenticated, Throttled)
+    Route::get('/public/web-pages/{username}/{slug}', [WebPageApiController::class, 'publicShow'])->middleware('throttle:120,1');
+    Route::get('/public/web-pages/{username}/{slug}/click/{blockId}', [WebPageApiController::class, 'publicClick'])->middleware('throttle:120,1');
+    Route::post('/public/web-pages/{username}/{slug}/submit/{blockId}', [WebPageApiController::class, 'publicSubmit'])->middleware('throttle:40,1');
 
     // 3. Meta Webhook Verification & Listener
     Route::get('/webhooks/instagram', [MetaWebhookController::class, 'verify']);

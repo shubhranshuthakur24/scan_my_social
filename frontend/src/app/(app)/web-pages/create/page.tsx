@@ -25,6 +25,7 @@ import {
   Monitor,
   AlertCircle,
   ArrowRight,
+  ArrowDown,
   Signal,
   Wifi,
   BatteryFull,
@@ -141,6 +142,17 @@ function CreateWizardContent() {
 
   // Preview device mode
   const [deviceMode, setDeviceMode] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
+
+  const previewSectionRef = useRef<HTMLDivElement>(null);
+
+  const scrollToPreview = () => {
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setMobileTab('preview');
+    }
+    setTimeout(() => {
+      previewSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+  };
 
 
   useEffect(() => {
@@ -494,14 +506,26 @@ function CreateWizardContent() {
               <h2 className="text-xs font-black uppercase tracking-wider text-slate-900">
                 Page Details & Theme
               </h2>
-              <button
-                type="button"
-                onClick={() => setCurrentStep(1)}
-                className="text-xs font-bold text-primary-600 hover:underline inline-flex items-center gap-1"
-              >
-                <span>Change Template</span>
-                <span className="text-slate-400 font-normal">({selectedTemplate?.name})</span>
-              </button>
+              <div className="flex items-center gap-2.5">
+                <button
+                  type="button"
+                  onClick={scrollToPreview}
+                  className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-50 hover:bg-purple-100 text-primary-700 border border-purple-200/80 text-xs font-bold transition shadow-2xs group cursor-pointer"
+                  title="Scroll to live preview below"
+                >
+                  <Eye size={13} className="text-primary-600" />
+                  <span>Preview Below</span>
+                  <ArrowDown size={12} className="text-primary-600 group-hover:translate-y-0.5 transition-transform" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCurrentStep(1)}
+                  className="text-xs font-bold text-primary-600 hover:underline inline-flex items-center gap-1 cursor-pointer"
+                >
+                  <span>Change Template</span>
+                  <span className="text-slate-400 font-normal">({selectedTemplate?.name})</span>
+                </button>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
@@ -637,11 +661,23 @@ function CreateWizardContent() {
 
             {/* Creation Action (Form Footer) */}
             <div className="pt-5 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <div className="text-xs text-slate-500">
-                <span>Selected template: </span>
-                <strong className="text-slate-900 font-bold">{selectedTemplate?.name}</strong>
-                <span className="text-slate-400 font-normal"> ({activePreset?.label} Theme)</span>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs text-slate-500">
+                <div>
+                  <span>Selected template: </span>
+                  <strong className="text-slate-900 font-bold">{selectedTemplate?.name}</strong>
+                  <span className="text-slate-400 font-normal"> ({activePreset?.label} Theme)</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={scrollToPreview}
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-primary-600 hover:text-primary-800 transition cursor-pointer group"
+                >
+                  <Eye size={13} className="text-primary-600 group-hover:scale-110 transition-transform" />
+                  <span>View live preview below</span>
+                  <ArrowDown size={12} className="text-primary-600 group-hover:translate-y-0.5 transition-transform" />
+                </button>
               </div>
+
               <Button
                 type="button"
                 variant="primary"
@@ -657,9 +693,27 @@ function CreateWizardContent() {
             </div>
           </div>
 
+          {/* Visual Hint Indicator that Live Preview is below */}
+          <div className="flex items-center justify-center -my-1">
+            <button
+              type="button"
+              onClick={scrollToPreview}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-purple-50/70 border border-slate-200/90 hover:border-purple-300 shadow-2xs text-xs font-bold text-slate-600 hover:text-primary-700 transition cursor-pointer group"
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+              </span>
+              <span>Live Canvas Preview is updating below</span>
+              <ArrowDown size={13} className="text-primary-600 group-hover:translate-y-0.5 transition-transform" />
+            </button>
+          </div>
+
           {/* Live Canvas Preview Section (hidden on <lg if mobileTab === 'details') */}
           <div
-            className={`space-y-3 ${
+            ref={previewSectionRef}
+            id="live-canvas-preview"
+            className={`space-y-3 scroll-mt-6 ${
               mobileTab === 'details' ? 'hidden lg:block' : 'block'
             }`}
           >
