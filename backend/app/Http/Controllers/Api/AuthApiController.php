@@ -85,6 +85,7 @@ class AuthApiController extends Controller
                 'id' => (string) $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
+                'bio' => $user->bio ?? '',
                 'avatar' => $user->avatar_url ?? '',
                 'role' => $user->role ?? 'User',
             ],
