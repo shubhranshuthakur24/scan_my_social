@@ -130,8 +130,8 @@ function CreateWizardContent() {
   const [description, setDescription] = useState('');
 
   // Dirty state tracking to prevent overwriting user-authored copy on template switch
-  const [isTitleDirty, setIsTitleDirty] = useState(false);
-  const [isDescriptionDirty, setIsDescriptionDirty] = useState(false);
+  const isTitleDirtyRef = useRef(false);
+  const isDescriptionDirtyRef = useRef(false);
 
   // Inline field validation
   const [titleError, setTitleError] = useState<string | null>(null);
@@ -181,8 +181,8 @@ function CreateWizardContent() {
             } else {
               setCurrentStep(1); // Explicit template selection starts on Step 1
             }
-            if (!isTitleDirty) setTitle(foundTpl.name);
-            if (!isDescriptionDirty) setDescription(foundTpl.description);
+            if (!isTitleDirtyRef.current) setTitle(foundTpl.name);
+            if (!isDescriptionDirtyRef.current) setDescription(foundTpl.description);
           }
         } else {
           // Precedence 2: Restore valid persisted creation state if present
@@ -190,8 +190,8 @@ function CreateWizardContent() {
           if (currentStore.selectedTemplateKey) {
             const foundStored = tpls.find((t) => t.key === currentStore.selectedTemplateKey);
             if (foundStored) {
-              if (!isTitleDirty) setTitle(foundStored.name);
-              if (!isDescriptionDirty) setDescription(foundStored.description);
+              if (!isTitleDirtyRef.current) setTitle(foundStored.name);
+              if (!isDescriptionDirtyRef.current) setDescription(foundStored.description);
               if (!currentStore.selectedThemeKey) {
                 setSelectedThemeKey(foundStored.theme_key || 'studio');
               }
@@ -213,7 +213,7 @@ function CreateWizardContent() {
     return () => {
       active = false;
     };
-  }, [rawTemplateParam, setSelectedTemplateKey, setSelectedThemeKey, setCurrentStep, resetCreationState, isTitleDirty, isDescriptionDirty]);
+  }, [rawTemplateParam, rawStepParam, setSelectedTemplateKey, setSelectedThemeKey, setCurrentStep, resetCreationState]);
 
   const safeTemplates: WebPageTemplate[] = Array.isArray(templates)
     ? templates
@@ -230,11 +230,11 @@ function CreateWizardContent() {
 
   const handleSelectTemplate = (tpl: WebPageTemplate) => {
     setSelectedTemplateKey(tpl.key);
-    if (!isTitleDirty) {
+    if (!isTitleDirtyRef.current) {
       setTitle(tpl.name);
       if (titleError) setTitleError(null);
     }
-    if (!isDescriptionDirty) {
+    if (!isDescriptionDirtyRef.current) {
       setDescription(tpl.description);
     }
     setSelectedThemeKey(tpl.theme_key || 'studio');
@@ -243,11 +243,11 @@ function CreateWizardContent() {
   const handleProceedToStep2 = () => {
     if (!selectedTemplate) return;
 
-    if (!isTitleDirty) {
+    if (!isTitleDirtyRef.current) {
       setTitle(selectedTemplate.name);
       if (titleError) setTitleError(null);
     }
-    if (!isDescriptionDirty) {
+    if (!isDescriptionDirtyRef.current) {
       setDescription(selectedTemplate.description);
     }
     setCurrentStep(2);
@@ -255,7 +255,7 @@ function CreateWizardContent() {
 
   const handleTitleChange = (val: string) => {
     setTitle(val);
-    setIsTitleDirty(true);
+    isTitleDirtyRef.current = true;
     if (titleError && val.trim()) {
       setTitleError(null);
     }
@@ -273,7 +273,7 @@ function CreateWizardContent() {
 
   const handleDescriptionChange = (val: string) => {
     setDescription(val);
-    setIsDescriptionDirty(true);
+    isDescriptionDirtyRef.current = true;
   };
 
   const dummyPreviewPage: WebPage = {
@@ -302,13 +302,15 @@ function CreateWizardContent() {
     setIsSaving(true);
     setSavingAction('draft');
 
+    const chosenTpl = selectedTemplate || safeTemplates.find((t) => t.key === selectedTemplateKey) || safeTemplates[0];
+
     const payload: CreateWebPagePayload = {
       title: title.trim(),
       slug: slug.trim() || undefined,
       description: description.trim() || undefined,
-      template_key: selectedTemplateKey || 'creator',
-      sections: selectedTemplate?.sections || [],
-      theme_settings: activePreset?.settings || selectedTemplate?.theme_settings || {},
+      template_key: selectedTemplateKey || chosenTpl?.key || 'creator',
+      sections: chosenTpl?.sections || [],
+      theme_settings: activePreset?.settings || chosenTpl?.theme_settings || {},
       is_published: false,
     };
 

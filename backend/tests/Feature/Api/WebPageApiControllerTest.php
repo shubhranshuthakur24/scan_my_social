@@ -12,11 +12,8 @@ class WebPageApiControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_catalog_can_be_retrieved(): void
+    public function test_catalog_can_be_retrieved_by_guest(): void
     {
-        $user = User::factory()->create();
-        Sanctum::actingAs($user);
-
         $response = $this->getJson('/api/v1/web-pages/catalog');
 
         $response->assertOk()
@@ -27,11 +24,11 @@ class WebPageApiControllerTest extends TestCase
 
         $this->assertNotEmpty($response->json('templates'));
         $this->assertNotEmpty($response->json('theme_presets'));
+        $this->assertContains('course_coaching', collect($response->json('templates'))->pluck('key')->all());
     }
 
     public function test_guest_cannot_access_protected_web_pages_api(): void
     {
-        $this->getJson('/api/v1/web-pages')->assertUnauthorized();
         $this->postJson('/api/v1/web-pages', ['title' => 'Test'])->assertUnauthorized();
     }
 

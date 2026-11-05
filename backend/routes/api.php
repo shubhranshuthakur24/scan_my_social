@@ -30,6 +30,10 @@ Route::prefix('v1')->group(function () {
     // Public / Flexible Profile Endpoint (supports Sanctum bearer token or dev fallback)
     Route::get('/instagram/profile', [InstagramProfileApiController::class, 'show']);
 
+    // Public / Flexible Web Pages Catalog & Dashboard List
+    Route::get('/web-pages/catalog', [WebPageApiController::class, 'catalog']);
+    Route::get('/web-pages', [WebPageApiController::class, 'index']);
+
     // 1. Protected Endpoints (Requires Sanctum Bearer Token)
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/auth/me', [AuthApiController::class, 'me']);
@@ -101,9 +105,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/lead-forms/{id}/cover', [LeadFormApiController::class, 'uploadCover']);
         Route::delete('/lead-forms/{id}/cover', [LeadFormApiController::class, 'removeCover']);
 
-        // Web Pages & Templates Catalog API
-        Route::get('/web-pages/catalog', [WebPageApiController::class, 'catalog']);
-        Route::get('/web-pages', [WebPageApiController::class, 'index']);
+        // Web Pages & Templates Management API
         Route::post('/web-pages', [WebPageApiController::class, 'store']);
         Route::get('/web-pages/{id}', [WebPageApiController::class, 'show']);
         Route::put('/web-pages/{id}', [WebPageApiController::class, 'update']);

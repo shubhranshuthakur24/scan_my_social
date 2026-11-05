@@ -254,6 +254,34 @@ class WebPage extends Model
     public static function templates(): array
     {
         return [
+            'course_coaching' => [
+                'label' => 'Course & Coaching',
+                'category' => 'Education',
+                'description' => 'A cohort-based curriculum and coaching page designed to enroll ambitious students.',
+                'theme_key' => 'candy',
+                'preview_image' => '/images/web-page-templates/course-coaching.jpg',
+                'sections' => [
+                    static::section('hero', ['eyebrow' => 'Cohort 04 · Enrolling now', 'heading' => 'Become a high-leverage creator and build systems that scale', 'body' => 'A 6-week intensive cohort designed to help operators, founders, and creators turn attention into an enduring business.', 'image_url' => '/images/web-page-templates/course-coaching.jpg', 'primary_label' => 'Apply for next cohort', 'primary_url' => '#contact', 'secondary_label' => 'Explore the syllabus', 'secondary_url' => '#syllabus']),
+                    static::section('features', ['heading' => 'What is inside the program', 'items' => [
+                        ['title' => 'Live Strategy Sessions', 'description' => 'Weekly breakdown sessions with direct feedback on your work.'],
+                        ['title' => 'Plug-and-play Templates', 'description' => 'Battle-tested frameworks for high-converting content and landing pages.'],
+                        ['title' => 'Private Operator Community', 'description' => 'Direct access to peer builders, alumni, and guest instructors.']
+                    ]]),
+                    static::section('timeline', ['heading' => '6-Week Curriculum', 'steps' => [
+                        ['time_or_step' => 'Week 1-2', 'title' => 'Positioning & Audience', 'description' => 'Identify your niche advantage and craft an irresistible offer.'],
+                        ['time_or_step' => 'Week 3-4', 'title' => 'Content & Distribution Engines', 'description' => 'Build high-converting organic pipelines on Instagram and LinkedIn.'],
+                        ['time_or_step' => 'Week 5-6', 'title' => 'Conversion & Scale', 'description' => 'Automate inbound lead flows and launch high-ticket offers.']
+                    ]]),
+                    static::section('pricing', ['heading' => 'Tuition & Enrollment', 'plans' => [
+                        ['name' => 'Self-Paced Core', 'price' => '$499', 'description' => 'Full access to recordings and templates.', 'features' => ['All 6 modules', 'Resource templates', 'Community access']],
+                        ['name' => 'Cohort VIP', 'price' => '$1,299', 'description' => 'Live sessions, direct reviews, and 1-on-1 mentorship.', 'features' => ['Everything in Core', 'Weekly live sessions', '1-on-1 strategy call', 'Certificate'], 'is_popular' => true]
+                    ]]),
+                    static::section('testimonials', ['heading' => 'Alumni Results', 'items' => [['quote' => 'This cohort paid for itself within two weeks of implementing the playbook.', 'name' => 'Alex Rivera', 'role' => 'Founder, ScaleCraft']]]),
+                    static::section('profile', ['heading' => 'Meet your lead instructor', 'name' => 'David Vance', 'role' => 'Ex-Head of Growth, Creator of 100k+ Audience', 'bio' => 'Trained over 1,500 builders and operators on scaling organic media into 7-figure businesses.']),
+                    static::section('faq', ['heading' => 'Frequently Asked Questions', 'items' => [['question' => 'How much weekly time commitment is required?', 'answer' => 'Expect around 3-5 hours weekly including sessions and assignments.']]]),
+                    static::section('contact_form', ['heading' => 'Apply for the next cohort', 'button_label' => 'Submit Application']),
+                ],
+            ],
             'creator' => [
                 'label' => 'Creator Studio',
                 'category' => 'Personal brand',
@@ -349,6 +377,48 @@ class WebPage extends Model
                     static::section('hero', ['eyebrow' => 'A letter every other Friday', 'heading' => 'Notes on making work that matters', 'body' => 'Essays and observations on creativity, attention, and building an independent practice.', 'image_url' => '/images/web-page-templates/newsletter.jpg', 'primary_label' => 'Join the readership', 'primary_url' => '#contact']),
                     static::section('testimonials', ['heading' => 'Reader Notes', 'items' => [['quote' => 'One of the few emails I open every week.', 'name' => 'Subscriber']]]),
                     static::section('contact_form', ['heading' => 'Subscribe now', 'button_label' => 'Subscribe']),
+                ],
+            ],
+            'waitlist' => [
+                'label' => 'Viral Waitlist',
+                'category' => 'Campaign',
+                'description' => 'A high-converting waitlist page for upcoming product drops, apps, and communities.',
+                'theme_key' => 'midnight',
+                'preview_image' => '/images/web-page-templates/waitlist.jpg',
+                'sections' => [
+                    static::section('hero', ['eyebrow' => 'Early access open', 'heading' => 'Be the first in line when we launch', 'body' => 'Reserve your spot today to unlock VIP perks, beta access, and founder-only updates.', 'image_url' => '/images/web-page-templates/waitlist.jpg', 'primary_label' => 'Join the waitlist', 'primary_url' => '#contact']),
+                    static::section('features', ['heading' => 'Early Access Perks', 'items' => [
+                        ['title' => 'Priority Onboarding', 'description' => 'Skip the public queue and access features ahead of everyone else.'],
+                        ['title' => 'Lifetime Founder Discount', 'description' => 'Lock in early supporter pricing before general availability.'],
+                    ]]),
+                    static::section('contact_form', ['heading' => 'Request an invite', 'button_label' => 'Reserve My Spot']),
+                ],
+            ],
+            'conversion_landing' => [
+                'label' => 'Conversion Landing',
+                'category' => 'Marketing',
+                'description' => 'A focused, high-conversion sales page built to turn visitors into buyers.',
+                'theme_key' => 'ocean',
+                'preview_image' => '/images/web-page-templates/conversion-landing.jpg',
+                'sections' => [
+                    static::section('hero', ['eyebrow' => 'Turn traffic into revenue', 'heading' => 'The complete system for scaling conversions', 'body' => 'Deliver memorable customer journeys that drive engagement, retention, and repeat sales.', 'image_url' => '/images/web-page-templates/conversion-landing.jpg', 'primary_label' => 'Start free trial', 'primary_url' => '#contact']),
+                    static::section('features', ['heading' => 'Built for modern growth', 'items' => [
+                        ['title' => 'Blazing Performance', 'description' => 'Sub-second loads that keep conversion drop-offs near zero.'],
+                        ['title' => 'Integrated Tracking', 'description' => 'Capture visitor intent and push qualified leads straight to your CRM.'],
+                    ]]),
+                    static::section('contact_form', ['heading' => 'Get in touch', 'button_label' => 'Get Started Today']),
+                ],
+            ],
+            'product_landing' => [
+                'label' => 'Product Landing',
+                'category' => 'Commerce',
+                'description' => 'Showcase a signature product with rich visuals, specs, and a frictionless checkout CTA.',
+                'theme_key' => 'sunrise',
+                'preview_image' => '/images/web-page-templates/product-landing.jpg',
+                'sections' => [
+                    static::section('hero', ['eyebrow' => 'Precision crafted', 'heading' => 'Engineered for those who notice the details', 'body' => 'An uncompromising balance of tactile materials, minimal form, and functional longevity.', 'image_url' => '/images/web-page-templates/product-landing.jpg', 'primary_label' => 'Order now', 'primary_url' => '#contact']),
+                    static::section('image', ['heading' => 'Crafted without shortcuts', 'image_url' => '/images/web-page-templates/product-landing.jpg', 'body' => 'Every surface is machined from aerospace-grade alloy and hand-finished.']),
+                    static::section('contact_form', ['heading' => 'Inquire about availability', 'button_label' => 'Place Order']),
                 ],
             ],
         ];

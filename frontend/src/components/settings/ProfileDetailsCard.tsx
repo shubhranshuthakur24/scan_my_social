@@ -53,7 +53,10 @@ export default function ProfileDetailsCard({ onToast }: ProfileDetailsCardProps)
           if (data.user.avatar) {
             setAvatarUrl(data.user.avatar);
           }
-          updateUser(data.user);
+          updateUser({
+            ...data.user,
+            role: data.user.role === 'super_admin' ? 'super_admin' : 'user',
+          });
         }
       })
       .catch(() => {

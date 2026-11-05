@@ -3,7 +3,6 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import WebPagesSkeleton from '@/components/web-pages/WebPagesSkeleton';
 import {
   WebPage,
@@ -40,7 +39,6 @@ import ConfirmModal from '@/components/ui/ConfirmModal';
 import PageHeader from '@/components/ui/PageHeader';
 
 export default function WebPagesDashboardPage() {
-  const router = useRouter();
   const [hasLoadedInitial, setHasLoadedInitial] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [mutatingState, setMutatingState] = useState<{ id: number; action: 'publish' | 'delete' } | null>(null);
@@ -399,6 +397,8 @@ export default function WebPagesDashboardPage() {
             const isPublishMutating = isCardMutating && mutatingState.action === 'publish';
             const isDeleteMutating = isCardMutating && mutatingState.action === 'delete';
             const fullPublicUrl = page.public_url ? buildPublicCardUrl(page.public_url) : null;
+            const normalizedKey = page.template_key ? page.template_key.replace(/_/g, '-') : 'creator';
+            const previewImageUrl = tpl?.preview_image || `/images/web-page-templates/${normalizedKey}.jpg`;
 
             return (
               <div
@@ -408,7 +408,7 @@ export default function WebPagesDashboardPage() {
                 {/* Top Card Preview Banner */}
                 <div className="relative h-44 bg-slate-100 overflow-hidden border-b border-slate-100">
                   <img
-                    src={tpl?.preview_image || `/images/web-page-templates/${page.template_key}.jpg`}
+                    src={previewImageUrl}
                     alt={page.title}
                     className="w-full h-full object-cover"
                     onError={(e) => {

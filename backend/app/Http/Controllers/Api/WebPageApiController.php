@@ -26,7 +26,10 @@ class WebPageApiController extends Controller
      */
     private function resolveUser(Request $request): User
     {
-        $user = Auth::user() ?: $request->user();
+        $user = Auth::guard('sanctum')->user()
+            ?: Auth::user()
+            ?: $request->user();
+
         if (!$user && app()->environment('local')) {
             $user = User::first();
         }
