@@ -26,6 +26,7 @@ import {
   AlertCircle,
   ArrowRight,
   ArrowDown,
+  Sparkles,
   Signal,
   Wifi,
   BatteryFull,
@@ -123,6 +124,27 @@ function CreateWizardContent() {
 
   const [templates, setTemplates] = useState<WebPageTemplate[]>([]);
   const [themePresets, setThemePresets] = useState<WebPageThemePreset[]>([]);
+
+  // Live sync animated feedback state
+  const [isLiveSyncing, setIsLiveSyncing] = useState(false);
+  const [syncFeedbackText, setSyncFeedbackText] = useState('Live Canvas Preview is updating below');
+  const syncTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const triggerLiveSync = (label: string) => {
+    setIsLiveSyncing(true);
+    setSyncFeedbackText(label);
+    if (syncTimerRef.current) clearTimeout(syncTimerRef.current);
+    syncTimerRef.current = setTimeout(() => {
+      setIsLiveSyncing(false);
+      setSyncFeedbackText('Live Canvas Preview is updating below');
+    }, 2200);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (syncTimerRef.current) clearTimeout(syncTimerRef.current);
+    };
+  }, []);
 
   // Form fields
   const [title, setTitle] = useState('');
@@ -238,6 +260,7 @@ function CreateWizardContent() {
       setDescription(tpl.description);
     }
     setSelectedThemeKey(tpl.theme_key || 'studio');
+    triggerLiveSync(`Selected "${tpl.name}" template`);
   };
 
   const handleProceedToStep2 = () => {
@@ -251,6 +274,7 @@ function CreateWizardContent() {
       setDescription(selectedTemplate.description);
     }
     setCurrentStep(2);
+    triggerLiveSync('Preview loaded with chosen template');
   };
 
   const handleTitleChange = (val: string) => {
@@ -259,6 +283,7 @@ function CreateWizardContent() {
     if (titleError && val.trim()) {
       setTitleError(null);
     }
+    triggerLiveSync('Headline updated live in preview');
   };
 
   const handleSlugChange = (val: string) => {
@@ -269,12 +294,33 @@ function CreateWizardContent() {
       .replace(/[^a-z0-9-]/g, '')
       .replace(/-+/g, '-');
     setSlug(formatted);
+    triggerLiveSync('URL slug updated live in preview');
   };
 
   const handleDescriptionChange = (val: string) => {
     setDescription(val);
     isDescriptionDirtyRef.current = true;
+    triggerLiveSync('Description updated live in preview');
   };
+
+  const handleThemeChange = (key: string, label: string) => {
+    setSelectedThemeKey(key);
+    triggerLiveSync(`"${label} Theme" applied live in preview`);
+  };
+
+  const previewSections = (selectedTemplate?.sections || []).map((sec, idx) => {
+    if (idx === 0 && sec.type === 'hero') {
+      return {
+        ...sec,
+        content: {
+          ...sec.content,
+          heading: title || sec.content?.heading,
+          body: description || sec.content?.body,
+        },
+      };
+    }
+    return sec;
+  });
 
   const dummyPreviewPage: WebPage = {
     id: 0,
@@ -282,7 +328,7 @@ function CreateWizardContent() {
     slug: slug || 'my-page',
     description: description || null,
     template_key: selectedTemplateKey || 'creator',
-    sections: selectedTemplate?.sections || [],
+    sections: previewSections,
     theme_settings: activePreset?.settings || selectedTemplate?.theme_settings || {},
     is_published: false,
     published_at: null,
@@ -512,12 +558,25 @@ function CreateWizardContent() {
                 <button
                   type="button"
                   onClick={scrollToPreview}
-                  className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-50 hover:bg-purple-100 text-primary-700 border border-purple-200/80 text-xs font-bold transition shadow-2xs group cursor-pointer"
+                  className={`hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all duration-300 shadow-2xs group cursor-pointer ${
+                    isLiveSyncing
+                      ? 'bg-primary-600 text-white ring-2 ring-primary-400 shadow-md scale-105'
+                      : 'bg-purple-50 hover:bg-purple-100 text-primary-700 border border-purple-200/80'
+                  }`}
                   title="Scroll to live preview below"
                 >
-                  <Eye size={13} className="text-primary-600" />
-                  <span>Preview Below</span>
-                  <ArrowDown size={12} className="text-primary-600 group-hover:translate-y-0.5 transition-transform" />
+                  {isLiveSyncing ? (
+                    <Sparkles size={13} className="text-white animate-spin" />
+                  ) : (
+                    <Eye size={13} className="text-primary-600" />
+                  )}
+                  <span>{isLiveSyncing ? 'Live Updating ↓' : 'Preview Below'}</span>
+                  <ArrowDown
+                    size={12}
+                    className={`transition-transform duration-200 ${
+                      isLiveSyncing ? 'text-white animate-bounce' : 'text-primary-600 group-hover:translate-y-0.5'
+                    }`}
+                  />
                 </button>
                 <button
                   type="button"
@@ -639,10 +698,10 @@ function CreateWizardContent() {
                         type="button"
                         role="radio"
                         aria-checked={isSelected}
-                        onClick={() => setSelectedThemeKey(preset.key)}
-                        className={`p-2.5 rounded-xl border text-left flex items-center justify-between transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
+                        onClick={() => handleThemeChange(preset.key, preset.label)}
+                        className={`p-2.5 rounded-xl border text-left flex items-center justify-between transition-all duration-200 active:scale-98 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 cursor-pointer ${
                           isSelected
-                            ? 'border-primary-600 bg-primary-50/50 shadow-2xs font-extrabold text-primary-900'
+                            ? 'border-primary-600 bg-primary-50/50 shadow-2xs font-extrabold text-primary-900 ring-2 ring-primary-500/25'
                             : 'border-slate-200 hover:bg-slate-50 text-slate-700 font-bold'
                         }`}
                       >
@@ -676,7 +735,17 @@ function CreateWizardContent() {
                 >
                   <Eye size={13} className="text-primary-600 group-hover:scale-110 transition-transform" />
                   <span>View live preview below</span>
-                  <ArrowDown size={12} className="text-primary-600 group-hover:translate-y-0.5 transition-transform" />
+                  <ArrowDown
+                    size={12}
+                    className={`text-primary-600 transition-transform ${
+                      isLiveSyncing ? 'animate-bounce' : 'group-hover:translate-y-0.5'
+                    }`}
+                  />
+                  {isLiveSyncing && (
+                    <span className="ml-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-200/80 animate-pulse">
+                      Live Synced
+                    </span>
+                  )}
                 </button>
               </div>
 
@@ -700,14 +769,33 @@ function CreateWizardContent() {
             <button
               type="button"
               onClick={scrollToPreview}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-purple-50/70 border border-slate-200/90 hover:border-purple-300 shadow-2xs text-xs font-bold text-slate-600 hover:text-primary-700 transition cursor-pointer group"
+              className={`inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full text-xs font-bold transition-all duration-300 cursor-pointer group ${
+                isLiveSyncing
+                  ? 'bg-gradient-to-r from-primary-600 via-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/25 ring-4 ring-purple-300/40 scale-105'
+                  : 'bg-white hover:bg-purple-50/70 border border-slate-200/90 hover:border-purple-300 shadow-2xs text-slate-600 hover:text-primary-700 hover:scale-102'
+              }`}
             >
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+              <span className="relative flex h-2.5 w-2.5 shrink-0">
+                <span
+                  className={`animate-ping absolute inline-flex h-full w-full rounded-full ${
+                    isLiveSyncing ? 'bg-white' : 'bg-emerald-400'
+                  } opacity-80`}
+                />
+                <span
+                  className={`relative inline-flex rounded-full h-2.5 w-2.5 ${
+                    isLiveSyncing ? 'bg-white' : 'bg-emerald-500'
+                  }`}
+                />
               </span>
-              <span>Live Canvas Preview is updating below</span>
-              <ArrowDown size={13} className="text-primary-600 group-hover:translate-y-0.5 transition-transform" />
+              <span className="truncate">
+                {isLiveSyncing ? `⚡ ${syncFeedbackText}` : 'Live Canvas Preview is updating below'}
+              </span>
+              <ArrowDown
+                size={14}
+                className={`transition-transform duration-200 ${
+                  isLiveSyncing ? 'text-white animate-bounce' : 'text-primary-600 group-hover:translate-y-0.5'
+                }`}
+              />
             </button>
           </div>
 
@@ -720,10 +808,33 @@ function CreateWizardContent() {
             }`}
           >
             <div className="flex items-center justify-between bg-white p-3 rounded-2xl border border-slate-200/80 shadow-2xs">
-              <span className="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-                <Eye size={14} className="text-primary-600" />
-                <span>Live Canvas Preview</span>
-              </span>
+              <div className="flex items-center gap-2.5">
+                <span className="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                  <Eye size={14} className="text-primary-600" />
+                  <span>Live Canvas Preview</span>
+                </span>
+                <span
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold transition-all duration-300 ${
+                    isLiveSyncing
+                      ? 'bg-purple-100 text-purple-800 ring-2 ring-purple-400 shadow-2xs'
+                      : 'bg-emerald-50 text-emerald-700 border border-emerald-200/80'
+                  }`}
+                >
+                  <span className="relative flex h-2 w-2">
+                    <span
+                      className={`absolute inline-flex h-full w-full rounded-full ${
+                        isLiveSyncing ? 'bg-purple-500 animate-ping' : 'bg-emerald-400 opacity-75'
+                      }`}
+                    />
+                    <span
+                      className={`relative inline-flex rounded-full h-2 w-2 ${
+                        isLiveSyncing ? 'bg-purple-600' : 'bg-emerald-500'
+                      }`}
+                    />
+                  </span>
+                  <span>{isLiveSyncing ? 'Live Updating...' : 'Live Synced'}</span>
+                </span>
+              </div>
 
               {/* 3-Mode Device Preview Switcher */}
               <div
@@ -783,7 +894,15 @@ function CreateWizardContent() {
                 <div className="w-[375px] max-w-full mx-auto">
                   <div className="relative mx-auto w-full">
                     {/* Bezel Frames */}
-                    <div className="rounded-[2.5rem] border-8 border-slate-800 shadow-2xl overflow-hidden bg-slate-950 flex flex-col">
+                    <div
+                      className={`rounded-[2.5rem] border-8 border-slate-800 shadow-2xl overflow-hidden bg-slate-950 flex flex-col transition-all duration-500 relative ${
+                        isLiveSyncing ? 'ring-4 ring-primary-500/40 shadow-[0_16px_50px_rgba(99,102,241,0.25)]' : ''
+                      }`}
+                    >
+                      {/* Subtle Top Glowing Live Scan Ray */}
+                      {isLiveSyncing && (
+                        <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-primary-500 to-transparent animate-pulse z-40 pointer-events-none" />
+                      )}
                       {/* iOS Status Bar */}
                       <div className="flex items-center justify-between px-6 pt-3 pb-1 text-[10px] font-semibold text-slate-300 bg-slate-950 shrink-0 select-none">
                         <span>9:41</span>
@@ -814,7 +933,15 @@ function CreateWizardContent() {
               ) : deviceMode === 'tablet' ? (
                 /* Realistic Tablet Mockup Frame (768px width with scrollable viewport) */
                 <div className="w-[768px] max-w-full mx-auto">
-                  <div className="rounded-2xl border-8 border-slate-800 shadow-2xl overflow-hidden bg-white flex flex-col">
+                  <div
+                    className={`rounded-2xl border-8 border-slate-800 shadow-2xl overflow-hidden bg-white flex flex-col transition-all duration-500 relative ${
+                      isLiveSyncing ? 'ring-4 ring-primary-500/40 shadow-[0_16px_50px_rgba(99,102,241,0.25)]' : ''
+                    }`}
+                  >
+                    {/* Subtle Top Glowing Live Scan Ray */}
+                    {isLiveSyncing && (
+                      <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-primary-500 to-transparent animate-pulse z-40 pointer-events-none" />
+                    )}
                     {/* Tablet Header / Camera Bezel */}
                     <div className="flex items-center justify-center py-2 bg-slate-800 border-b border-slate-700 shrink-0">
                       <div className="w-2.5 h-2.5 rounded-full bg-slate-700 border border-slate-600" />
@@ -833,7 +960,17 @@ function CreateWizardContent() {
                 </div>
               ) : (
                 /* Realistic Desktop Browser Frame with Scrollable Viewport */
-                <div className="w-full max-w-6xl mx-auto bg-white rounded-2xl border border-slate-300/80 shadow-2xl overflow-hidden flex flex-col">
+                <div
+                  className={`w-full max-w-6xl mx-auto bg-white rounded-2xl border transition-all duration-500 overflow-hidden flex flex-col relative ${
+                    isLiveSyncing
+                      ? 'border-primary-400 ring-4 ring-primary-500/35 shadow-[0_16px_50px_rgba(99,102,241,0.2)]'
+                      : 'border-slate-300/80 shadow-2xl'
+                  }`}
+                >
+                  {/* Subtle Top Glowing Live Scan Ray */}
+                  {isLiveSyncing && (
+                    <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-primary-500 to-transparent animate-pulse z-40 pointer-events-none" />
+                  )}
                   {/* Browser Chrome Header */}
                   <div className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 border-b border-slate-200 shrink-0">
                     <div className="flex items-center gap-1.5">
@@ -841,8 +978,17 @@ function CreateWizardContent() {
                       <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
                       <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
                     </div>
-                    <div className="flex-1 max-w-sm mx-auto bg-white px-3 py-1 rounded-lg border border-slate-200 text-[11px] text-slate-500 font-mono text-center truncate">
-                      {slug ? `scanmysocial.com/p/${slug}` : 'scanmysocial.com/p/your-page'}
+                    <div
+                      className={`flex-1 max-w-sm mx-auto px-3 py-1 rounded-lg border text-[11px] font-mono text-center truncate transition-all duration-300 flex items-center justify-center gap-1.5 ${
+                        isLiveSyncing
+                          ? 'bg-purple-50 border-purple-300 text-purple-900 shadow-2xs'
+                          : 'bg-white border-slate-200 text-slate-500'
+                      }`}
+                    >
+                      {isLiveSyncing && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping shrink-0" />
+                      )}
+                      <span>{slug ? `scanmysocial.com/p/${slug}` : 'scanmysocial.com/p/your-page'}</span>
                     </div>
                   </div>
                   {/* Desktop Viewport */}
